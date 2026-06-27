@@ -72,7 +72,7 @@ export default function MacBookScene() {
         gl={{ antialias: true, alpha: true }}
         style={{ background: 'transparent' }}
         dpr={[1, 1.5]}
-        frameloop="always"
+        frameloop="demand"
       >
         <ambientLight intensity={0.4} />
         <directionalLight position={[5, 8, 5]} intensity={1.5} color="#ffffff" />

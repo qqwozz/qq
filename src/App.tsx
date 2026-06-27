@@ -16,7 +16,8 @@ function splitToSpans(text: string) {
       letterSpan.style.opacity = '0'
       wordSpan.appendChild(letterSpan)
     })
-    wordSpan.innerHTML += ' '
+    const space = document.createTextNode(' ')
+    wordSpan.appendChild(space)
     container.appendChild(wordSpan)
   })
   return container
@@ -41,9 +42,10 @@ function initScrubAnimation(
 function App() {
   const navbarRef = useRef<HTMLElement>(null)
   const scrollIndicatorRef = useRef<HTMLDivElement>(null)
+  const backToTopRef = useRef<HTMLButtonElement>(null)
+  const mobileMenuRef = useRef<HTMLDivElement>(null)
   const [loading, setLoading] = useState(true)
   const [loadingFade, setLoadingFade] = useState(false)
-  const [showTopBtn, setShowTopBtn] = useState(false)
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const [stats, setStats] = useState({ repos: 0, stars: 0, followers: 0, languages: 6 })
 
@@ -58,7 +60,9 @@ function App() {
       scrollIndicatorRef.current.classList.toggle('hidden', scrollTop > 100)
     }
 
-    setShowTopBtn(scrollTop > 600)
+    if (backToTopRef.current) {
+      backToTopRef.current.classList.toggle('visible', scrollTop > 600)
+    }
 
     const sections = document.querySelectorAll<HTMLElement>('section[id]')
     const navLinks = document.querySelectorAll<HTMLElement>('.nav-link')
@@ -77,6 +81,27 @@ function App() {
     window.addEventListener('scroll', handleScroll, { passive: true })
     return () => window.removeEventListener('scroll', handleScroll)
   }, [handleScroll])
+
+  useEffect(() => {
+    if (!mobileMenuOpen) return
+
+    const handleKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') setMobileMenuOpen(false)
+    }
+
+    const handleClick = (e: MouseEvent) => {
+      if (mobileMenuRef.current && !mobileMenuRef.current.contains(e.target as Node)) {
+        setMobileMenuOpen(false)
+      }
+    }
+
+    document.addEventListener('keydown', handleKey)
+    document.addEventListener('mousedown', handleClick)
+    return () => {
+      document.removeEventListener('keydown', handleKey)
+      document.removeEventListener('mousedown', handleClick)
+    }
+  }, [mobileMenuOpen])
 
   useEffect(() => {
     const t1 = setTimeout(() => setLoadingFade(true), 1000)
@@ -214,7 +239,7 @@ function App() {
             </button>
           </div>
         </div>
-        <div className={`mobile-menu${mobileMenuOpen ? ' open' : ''}`}>
+        <div className={`mobile-menu${mobileMenuOpen ? ' open' : ''}`} ref={mobileMenuRef}>
           <a href="#about" className="mobile-link" onClick={closeMobileMenu}>обо мне</a>
           <a href="#experience" className="mobile-link" onClick={closeMobileMenu}>опыт</a>
           <a href="#projects" className="mobile-link" onClick={closeMobileMenu}>проекты</a>
@@ -481,7 +506,8 @@ async def execute_trade(trade: Trade):
       </footer>
 
       <button
-        className={`back-to-top${showTopBtn ? ' visible' : ''}`}
+        className="back-to-top"
+        ref={backToTopRef}
         onClick={() => window.scrollTo({ top: 0 })}
         aria-label="Наверх"
       >
