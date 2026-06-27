@@ -4,7 +4,7 @@ import { useGLTF, Environment } from '@react-three/drei'
 import * as THREE from 'three'
 
 function MacBookModel({ scrollProgress }: { scrollProgress: number }) {
-  const { scene } = useGLTF('/MacBook%20Ultra.glb')
+  const { scene } = useGLTF(`${import.meta.env.BASE_URL}MacBook%20Ultra.glb`)
   const group = useRef<THREE.Group>(null!)
   const targetRotation = useRef(0)
   const currentRotation = useRef(0)
