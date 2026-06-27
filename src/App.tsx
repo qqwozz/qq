@@ -213,31 +213,22 @@ function App() {
       {/* HERO */}
       <section className="hero" id="hero">
         <div className="hero-glow" />
-        <div className="hero-code-bg">{`import React from 'react';
-import { motion } from 'framer-motion';
+        <div className="hero-code-bg">{`from fastapi import FastAPI
+from pydantic import BaseModel
 
-const App = () => {
-  return (
-    <div className="app">
-      <motion.h1
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.8 }}
-      >
-        qqwozz
-      </motion.h1>
-      <motion.p
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ delay: 0.3 }}
-      >
-        fullstack developer
-      </motion.p>
-    </div>
-  );
-};
+app = FastAPI()
 
-export default App;`}</div>
+class Trade(BaseModel):
+    symbol: str
+    amount: float
+    side: str
+
+@app.post("/trade")
+async def execute_trade(trade: Trade):
+    result = await matching_engine.process(trade)
+    return {"status": "executed", "id": result.id}
+
+# qwwozzz @ VTB dev`}</div>
         <div className="hero-image-wrap">
           <div className="hero-orb hero-orb-1" />
           <div className="hero-orb hero-orb-2" />
@@ -246,7 +237,7 @@ export default App;`}</div>
 
         <div className="hero-content">
           <h1 className="hero-title" data-scrub-hero>QQWOZZ</h1>
-          <p className="hero-subtitle" data-scrub-hero-sub>разработчик</p>
+          <p className="hero-subtitle" data-scrub-hero-sub>back-end developer</p>
         </div>
         <div className="scroll-indicator">
           <div className="scroll-line" />
@@ -271,9 +262,10 @@ export default App;`}</div>
               <div className="showcase-code">
                 <span className="comment">// qqwozz @ 2024</span><br />
                 <span className="keyword">const</span> developer = {'{'}<br />
-                &nbsp;&nbsp;name: <span className="string">"qqwozz"</span>,<br />
-                &nbsp;&nbsp;stack: [<span className="string">"react"</span>, <span className="string">"node"</span>, <span className="string">"typescript"</span>],<br />
-                &nbsp;&nbsp;motto: <span className="string">"чистый код без компромиссов"</span>,<br />
+                &nbsp;&nbsp;name: <span className="string">"Dima Kiselev"</span>,<br />
+                &nbsp;&nbsp;role: <span className="string">"back-end developer"</span>,<br />
+                &nbsp;&nbsp;stack: [<span className="string">"python"</span>, <span className="string">"go"</span>, <span className="string">"C++"</span>],<br />
+                &nbsp;&nbsp;company: <span className="string">"VTB"</span>,<br />
                 &nbsp;&nbsp;passion: <span className="keyword">Infinity</span><br />
                 {'}'};
               </div>
@@ -293,29 +285,29 @@ export default App;`}</div>
             <div className="reveal-el">
               <div className="about-label">обо мне</div>
               <p className="about-text">
-                я <strong>qqwozz</strong> — веб-разработчик, который создаёт современные, быстрые и красивые интерфейсы.
+                я <strong>Dima Kiselev</strong> (qqwozz) — backend-разработчик в <strong>VTB</strong>, работаю с <strong>Python</strong>, <strong>Go</strong> и <strong>C++</strong>.
                 <br /><br />
-                мой подход — <strong>чистый код</strong>, внимание к деталям и стремление к совершенству в каждом проекте.
+                создаю микросервисы, API и high-load системы. мой подход — <strong>чистая архитектура</strong>, производительность и надёжность.
                 <br /><br />
-                если тебе нужен разработчик, который горит своим делом — ты по адресу.
+                MTUCI — Moscow Technical University of Communications and Informatics. Москва.
               </p>
             </div>
             <div className="about-stats reveal-el">
               <div className="stat-cell">
-                <div className="stat-number" data-count="50">0</div>
-                <div className="stat-label">проектов</div>
+                <div className="stat-number" data-count="17">0</div>
+                <div className="stat-label">репозиториев</div>
               </div>
               <div className="stat-cell">
-                <div className="stat-number" data-count="3">0</div>
-                <div className="stat-label">года опыта</div>
+                <div className="stat-number" data-count="13">0</div>
+                <div className="stat-label">звёзд</div>
               </div>
               <div className="stat-cell">
-                <div className="stat-number" data-count="100">0</div>
-                <div className="stat-label">клиентов</div>
+                <div className="stat-number" data-count="4">0</div>
+                <div className="stat-label">фолловеров</div>
               </div>
               <div className="stat-cell">
-                <div className="stat-number" data-count="99">0</div>
-                <div className="stat-label">% довольных</div>
+                <div className="stat-number" data-count="6">0</div>
+                <div className="stat-label">языков</div>
               </div>
             </div>
           </div>
@@ -332,23 +324,23 @@ export default App;`}</div>
           <div className="features-grid reveal-el">
             <div className="feature-cell">
               <div className="feature-num">001</div>
-              <div className="feature-name">фронтенд</div>
-              <div className="feature-value">react, vue, next.js,<br />typescript, tailwind</div>
+              <div className="feature-name">бэкенд</div>
+              <div className="feature-value">Python, Go, C++,<br />FastAPI, Django</div>
             </div>
             <div className="feature-cell">
               <div className="feature-num">002</div>
-              <div className="feature-name">бэкенд</div>
-              <div className="feature-value">node.js, python,<br />postgreSQL, redis</div>
+              <div className="feature-name">базы данных</div>
+              <div className="feature-value">PostgreSQL, MySQL,<br />Redis, SQLite</div>
             </div>
             <div className="feature-cell">
               <div className="feature-num">003</div>
               <div className="feature-name">инструменты</div>
-              <div className="feature-value">git, docker, ci/cd,<br />linux, figma</div>
+              <div className="feature-value">Docker, Linux, Git,<br />GitHub, gRPC</div>
             </div>
             <div className="feature-cell">
               <div className="feature-num">004</div>
-              <div className="feature-name">подход</div>
-              <div className="feature-value">честный код,<br />без компромиссов</div>
+              <div className="feature-name">специализация</div>
+              <div className="feature-value">микросервисы,<br />high-load, API</div>
             </div>
           </div>
         </div>
@@ -405,35 +397,35 @@ export default App;`}</div>
           <div className="section-number">003</div>
           <p className="scrub-each-word" scrub-each-word="">избранные проекты</p>
           <div className="projects-list reveal-el">
-            <a className="project-row" href="#">
+            <a className="project-row" href="https://github.com/qqwozz/QW_Trading_Platform" target="_blank" rel="noreferrer">
               <span className="project-idx">01</span>
-              <span className="project-name">игровой портал</span>
-              <span className="project-desc">платформа для геймеров</span>
-              <span className="project-status">react, node.js</span>
+              <span className="project-name">qw trading platform</span>
+              <span className="project-desc">крипто-биржа с C++ matching engine</span>
+              <span className="project-status">C++, Go, gRPC</span>
             </a>
-            <a className="project-row" href="#">
+            <a className="project-row" href="https://github.com/qqwozz/qw_pay" target="_blank" rel="noreferrer">
               <span className="project-idx">02</span>
-              <span className="project-name">фитнес-трекер</span>
-              <span className="project-desc">мобильное приложение</span>
-              <span className="project-status">react native</span>
+              <span className="project-name">qw_pay</span>
+              <span className="project-desc">микросервис платежей</span>
+              <span className="project-status">Go, JWT, OTP</span>
             </a>
-            <a className="project-row" href="#">
+            <a className="project-row" href="https://github.com/qqwozz/enf-shop" target="_blank" rel="noreferrer">
               <span className="project-idx">03</span>
-              <span className="project-name">интернет-магазин</span>
-              <span className="project-desc">e-commerce платформа</span>
-              <span className="project-status">next.js, stripe</span>
+              <span className="project-name">enf-shop</span>
+              <span className="project-desc">интернет-магазин одежды</span>
+              <span className="project-status">Django, HTMX, Docker</span>
             </a>
-            <a className="project-row" href="#">
+            <a className="project-row" href="https://github.com/qqwozz/AI-chat-bot" target="_blank" rel="noreferrer">
               <span className="project-idx">04</span>
-              <span className="project-name">аналитика продаж</span>
-              <span className="project-desc">дашборд с графиками</span>
-              <span className="project-status">vue.js, d3.js</span>
+              <span className="project-name">ai-chat-bot</span>
+              <span className="project-desc">NLP чат-бот на ИИ</span>
+              <span className="project-status">Python, NLP</span>
             </a>
-            <a className="project-row" href="#">
+            <a className="project-row" href="https://github.com/qqwozz/autoadmin" target="_blank" rel="noreferrer">
               <span className="project-idx">05</span>
-              <span className="project-name">чат-приложение</span>
-              <span className="project-desc">мессенджер реалтайм</span>
-              <span className="project-status">socket.io, react</span>
+              <span className="project-name">autoadmin</span>
+              <span className="project-desc">API + Telegram-бот для записей</span>
+              <span className="project-status">Go, SQLite, JWT</span>
             </a>
           </div>
         </div>
@@ -448,46 +440,46 @@ export default App;`}</div>
           <p className="scrub-each-word" scrub-each-word="">технологии</p>
           <div className="skills-row reveal-el">
             <div className="skill-cell">
-              <div className="skill-icon">JS</div>
-              <div className="skill-name">javascript</div>
+              <div className="skill-icon">PY</div>
+              <div className="skill-name">python</div>
               <div className="skill-level">эксперт</div>
             </div>
             <div className="skill-cell">
-              <div className="skill-icon">TS</div>
-              <div className="skill-name">typescript</div>
+              <div className="skill-icon">GO</div>
+              <div className="skill-name">go</div>
               <div className="skill-level">продвинутый</div>
             </div>
             <div className="skill-cell">
-              <div className="skill-icon">RN</div>
-              <div className="skill-name">react</div>
-              <div className="skill-level">эксперт</div>
+              <div className="skill-icon">C+</div>
+              <div className="skill-name">c++</div>
+              <div className="skill-level">средний</div>
             </div>
             <div className="skill-cell">
-              <div className="skill-icon">NJ</div>
-              <div className="skill-name">node.js</div>
+              <div className="skill-icon">PG</div>
+              <div className="skill-name">postgresql</div>
               <div className="skill-level">продвинутый</div>
             </div>
           </div>
           <div className="skills-row-2 reveal-el">
             <div className="skill-cell">
-              <div className="skill-icon">PY</div>
-              <div className="skill-name">python</div>
-              <div className="skill-level">продвинутый</div>
-            </div>
-            <div className="skill-cell">
-              <div className="skill-icon">PG</div>
-              <div className="skill-name">postgresql</div>
-              <div className="skill-level">средний</div>
-            </div>
-            <div className="skill-cell">
               <div className="skill-icon">DK</div>
               <div className="skill-name">docker</div>
-              <div className="skill-level">средний</div>
+              <div className="skill-level">продвинутый</div>
             </div>
             <div className="skill-cell">
               <div className="skill-icon">GT</div>
               <div className="skill-name">git</div>
               <div className="skill-level">эксперт</div>
+            </div>
+            <div className="skill-cell">
+              <div className="skill-icon">LX</div>
+              <div className="skill-name">linux</div>
+              <div className="skill-level">продвинутый</div>
+            </div>
+            <div className="skill-cell">
+              <div className="skill-icon">GR</div>
+              <div className="skill-name">gRPC</div>
+              <div className="skill-level">средний</div>
             </div>
           </div>
         </div>
@@ -502,24 +494,24 @@ export default App;`}</div>
           <p className="scrub-each-word" scrub-each-word="">полный стек</p>
           <div className="stack-table reveal-el">
             <div className="stack-row">
-              <div className="stack-label">фронтенд</div>
-              <div className="stack-value">React, Vue, Next.js, TypeScript, Tailwind CSS, GSAP, Framer Motion</div>
-            </div>
-            <div className="stack-row">
               <div className="stack-label">бэкенд</div>
-              <div className="stack-value">Node.js, Express, Fastify, Python, Django, FastAPI</div>
+              <div className="stack-value">Python, Go, C++, FastAPI, Django, gRPC</div>
             </div>
             <div className="stack-row">
               <div className="stack-label">базы данных</div>
-              <div className="stack-value">PostgreSQL, MongoDB, Redis, Firebase</div>
+              <div className="stack-value">PostgreSQL, MySQL, Redis, SQLite</div>
+            </div>
+            <div className="stack-row">
+              <div className="stack-label">инфраструктура</div>
+              <div className="stack-value">Docker, Linux, Nginx, Gunicorn</div>
             </div>
             <div className="stack-row">
               <div className="stack-label">инструменты</div>
-              <div className="stack-value">Git, Docker, GitHub Actions, Linux, Nginx, Vercel</div>
+              <div className="stack-value">Git, GitHub, GitHub Actions, Postman, VS Code</div>
             </div>
             <div className="stack-row">
-              <div className="stack-label">дизайн</div>
-              <div className="stack-value">Figma, Adobe XD, Photoshop</div>
+              <div className="stack-label">специализация</div>
+              <div className="stack-value">микросервисы, платежные системы, high-load, trading</div>
             </div>
           </div>
         </div>
@@ -541,9 +533,9 @@ export default App;`}</div>
                 <svg viewBox="0 0 24 24"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z" /></svg>
                 github
               </a>
-              <a href="https://t.me/qqwozz" target="_blank" rel="noreferrer" className="contact-link">
+              <a href="https://t.me/qwwozzz" target="_blank" rel="noreferrer" className="contact-link">
                 <svg viewBox="0 0 24 24"><path d="M11.944 0A12 12 0 000 12a12 12 0 0012 12 12 12 0 0012-12A12 12 0 0012 0h-.056zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 01.171.325c.016.093.036.306.02.472-.18 1.898-.962 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.479.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z" /></svg>
-                telegram
+                telegram @qwwozzz
               </a>
             </div>
           </div>
@@ -557,7 +549,7 @@ export default App;`}</div>
             <span className="footer-copy">все права защищены</span>
             <div className="footer-links">
               <a href="https://github.com/qqwozz" target="_blank" rel="noreferrer">github</a>
-              <a href="https://t.me/qqwozz" target="_blank" rel="noreferrer">telegram</a>
+              <a href="https://t.me/qwwozzz" target="_blank" rel="noreferrer">telegram</a>
               <a href="#contact">связаться</a>
             </div>
           </div>
