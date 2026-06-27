@@ -121,6 +121,7 @@ body::before {
     position: relative;
     padding-top: 80px;
     overflow: hidden;
+    z-index: 1;
 }
 
 .hero-glow {
@@ -144,6 +145,7 @@ body::before {
 .hero-content {
     position: relative;
     z-index: 3;
+    text-shadow: 0 0 60px rgba(0, 0, 0, 0.9), 0 0 120px rgba(0, 0, 0, 0.7);
 }
 
 .hero-title {
@@ -256,6 +258,10 @@ body::before {
 .section {
     padding: 160px 0;
     position: relative;
+    z-index: 1;
+    background: rgba(10, 10, 10, 0.85);
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
 }
 
 .section-number {
@@ -298,6 +304,10 @@ body::before {
     padding: 100px 0;
     position: relative;
     overflow: hidden;
+    z-index: 1;
+    background: rgba(10, 10, 10, 0.85);
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
 }
 
 .showcase-inner {
@@ -723,6 +733,10 @@ body::before {
 .contact-block {
     text-align: center;
     padding: 160px 0;
+    z-index: 1;
+    background: rgba(10, 10, 10, 0.85);
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
 }
 
 .contact-title {
@@ -798,6 +812,8 @@ body::before {
     border-top: 1px solid rgba(255, 255, 255, 0.05);
     padding: 40px 0;
     position: relative;
+    z-index: 1;
+    background: rgba(10, 10, 10, 0.9);
 }
 
 .footer::before {
@@ -848,6 +864,7 @@ body::before {
     background: linear-gradient(to bottom, transparent, rgba(255,255,255,0.2), transparent);
     margin: 0 auto;
     position: relative;
+    z-index: 1;
 }
 
 .divider::before {
@@ -864,12 +881,12 @@ body::before {
 
 /* ========== 3D CANVAS ========== */
 .three-canvas-container {
-    position: absolute;
+    position: fixed;
     top: 0;
     left: 0;
-    width: 100%;
-    height: 100%;
-    z-index: 1;
+    width: 100vw;
+    height: 100vh;
+    z-index: 0;
     pointer-events: none;
 }
 

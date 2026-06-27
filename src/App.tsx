@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState, useCallback } from 'react'
+import { useEffect, useRef, useCallback } from 'react'
 import MacBookScene from './components/MacBookScene'
 import { gsap } from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
@@ -6,14 +6,10 @@ import { ScrollTrigger } from 'gsap/ScrollTrigger'
 gsap.registerPlugin(ScrollTrigger)
 
 function App() {
-  const [scrollProgress, setScrollProgress] = useState(0)
   const navbarRef = useRef<HTMLElement>(null)
 
   const handleScroll = useCallback(() => {
     const scrollTop = window.scrollY
-    const docHeight = document.documentElement.scrollHeight - window.innerHeight
-    const progress = docHeight > 0 ? scrollTop / docHeight : 0
-    setScrollProgress(progress)
 
     if (navbarRef.current) {
       navbarRef.current.classList.toggle('scrolled', scrollTop > 50)
@@ -196,6 +192,8 @@ function App() {
 
   return (
     <>
+      <MacBookScene />
+
       {/* NAVBAR */}
       <nav className="navbar" ref={navbarRef}>
         <div className="container">
@@ -245,8 +243,6 @@ export default App;`}</div>
           <div className="hero-orb hero-orb-2" />
           <div className="hero-orb hero-orb-3" />
         </div>
-
-        <MacBookScene scrollProgress={scrollProgress} />
 
         <div className="hero-content">
           <h1 className="hero-title" data-scrub-hero>QQWOZZ</h1>
