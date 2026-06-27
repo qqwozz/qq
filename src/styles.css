@@ -7,8 +7,6 @@
     --text-secondary: #939393;
     --text-muted: #555555;
     --bg-primary: #0a0a0a;
-    --bg-card: #111111;
-    --border: #1a1a1a;
 }
 
 html { overflow-x: hidden; scroll-behavior: smooth; }
@@ -110,6 +108,72 @@ body::before {
 .nav-contact:hover {
     color: var(--text-primary);
     text-shadow: 0 0 20px rgba(255, 255, 255, 0.1);
+}
+
+/* ========== BURGER ========== */
+.nav-burger {
+    display: none;
+    flex-direction: column;
+    gap: 5px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 4px;
+    z-index: 110;
+}
+
+.nav-burger span {
+    display: block;
+    width: 22px;
+    height: 1.5px;
+    background: var(--text-secondary);
+    transition: all 0.3s ease;
+    transform-origin: center;
+}
+
+.nav-burger.active span:nth-child(1) {
+    transform: translateY(6.5px) rotate(45deg);
+}
+
+.nav-burger.active span:nth-child(2) {
+    opacity: 0;
+}
+
+.nav-burger.active span:nth-child(3) {
+    transform: translateY(-6.5px) rotate(-45deg);
+}
+
+.mobile-menu {
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    gap: 0;
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.35s ease, padding 0.35s ease;
+    background: rgba(10, 10, 10, 0.95);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+}
+
+.mobile-menu.open {
+    max-height: 300px;
+    padding: 24px 0;
+}
+
+.mobile-link {
+    color: var(--text-secondary);
+    text-decoration: none;
+    font-size: 15px;
+    font-weight: 500;
+    letter-spacing: 1px;
+    text-transform: lowercase;
+    padding: 12px 0;
+    transition: color 0.3s;
+}
+
+.mobile-link:hover {
+    color: var(--text-primary);
 }
 
 /* ========== HERO ========== */
@@ -991,6 +1055,8 @@ body::before {
 @media (max-width: 992px) {
     .container { padding: 0 24px; }
     .nav-links, .nav-contact { display: none; }
+    .nav-burger { display: flex; }
+    .mobile-menu { display: flex; }
     .about-grid { grid-template-columns: 1fr; gap: 48px; }
     .features-grid { grid-template-columns: 1fr 1fr; }
     .project-row { grid-template-columns: 60px 1fr 140px; }
@@ -1014,6 +1080,11 @@ body::before {
     .footer-inner { flex-direction: column; gap: 16px; text-align: center; }
     .contact-links { flex-direction: column; align-items: center; }
     .contact-link { width: 100%; max-width: 280px; justify-content: center; }
+}
+
+/* ========== CONTACT WRAPPER ========== */
+.contact-links-wrapper {
+    margin-top: 56px;
 }
 
 /* ========== BACK TO TOP ========== */
