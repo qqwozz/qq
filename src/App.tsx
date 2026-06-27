@@ -1,4 +1,4 @@
-import { useEffect, useRef, useCallback } from 'react'
+import { useEffect, useRef, useCallback, useState } from 'react'
 import MacBookScene from './components/MacBookScene'
 import { gsap } from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
@@ -7,6 +7,10 @@ gsap.registerPlugin(ScrollTrigger)
 
 function App() {
   const navbarRef = useRef<HTMLElement>(null)
+  const scrollIndicatorRef = useRef<HTMLDivElement>(null)
+  const [loading, setLoading] = useState(true)
+  const [showTopBtn, setShowTopBtn] = useState(false)
+  const [stats, setStats] = useState({ repos: 0, stars: 0, followers: 0, languages: 6 })
 
   const handleScroll = useCallback(() => {
     const scrollTop = window.scrollY
@@ -14,6 +18,12 @@ function App() {
     if (navbarRef.current) {
       navbarRef.current.classList.toggle('scrolled', scrollTop > 50)
     }
+
+    if (scrollIndicatorRef.current) {
+      scrollIndicatorRef.current.classList.toggle('hidden', scrollTop > 100)
+    }
+
+    setShowTopBtn(scrollTop > 600)
   }, [])
 
   useEffect(() => {
@@ -22,7 +32,36 @@ function App() {
   }, [handleScroll])
 
   useEffect(() => {
-    // scrub-text animation
+    const timer = setTimeout(() => setLoading(false), 1200)
+    return () => clearTimeout(timer)
+  }, [])
+
+  useEffect(() => {
+    fetch('https://api.github.com/users/qqwozz')
+      .then((r) => r.json())
+      .then((data) => {
+        if (data) {
+          setStats((s) => ({
+            ...s,
+            repos: data.public_repos ?? s.repos,
+            followers: data.followers ?? s.followers,
+          }))
+        }
+      })
+      .catch(() => {})
+
+    fetch('https://api.github.com/users/qqwozz/repos?per_page=100')
+      .then((r) => r.json())
+      .then((repos) => {
+        if (Array.isArray(repos)) {
+          const totalStars = repos.reduce((sum: number, r: any) => sum + (r.stargazers_count ?? 0), 0)
+          setStats((s) => ({ ...s, stars: totalStars }))
+        }
+      })
+      .catch(() => {})
+  }, [])
+
+  useEffect(() => {
     document.querySelectorAll<HTMLElement>('[scrub-text]').forEach((el) => {
       const words = el.textContent!.split(' ')
       el.textContent = ''
@@ -51,7 +90,6 @@ function App() {
       )
     })
 
-    // scrub-each-word animation
     document.querySelectorAll<HTMLElement>('[scrub-each-word]').forEach((el) => {
       const words = el.textContent!.split(' ')
       el.textContent = ''
@@ -80,7 +118,6 @@ function App() {
       )
     })
 
-    // Hero title
     const heroTitle = document.querySelector<HTMLElement>('[data-scrub-hero]')
     if (heroTitle) {
       const text = heroTitle.textContent!
@@ -105,7 +142,6 @@ function App() {
       )
     }
 
-    // Hero subtitle
     const heroSub = document.querySelector<HTMLElement>('[data-scrub-hero-sub]')
     if (heroSub) {
       gsap.fromTo(heroSub, { opacity: 0, y: 20 }, {
@@ -117,7 +153,6 @@ function App() {
       })
     }
 
-    // Reveal elements
     document.querySelectorAll<HTMLElement>('.reveal-el').forEach((el) => {
       gsap.fromTo(el, { opacity: 0, y: 60 }, {
         opacity: 1,
@@ -128,7 +163,6 @@ function App() {
       })
     })
 
-    // Counter
     document.querySelectorAll<HTMLElement>('[data-count]').forEach((counter) => {
       const target = parseInt(counter.getAttribute('data-count')!)
       gsap.fromTo(counter, { textContent: '0' }, {
@@ -140,7 +174,6 @@ function App() {
       })
     })
 
-    // Showcase code block animation
     const showcaseCode = document.querySelector<HTMLElement>('.showcase-code')
     if (showcaseCode) {
       gsap.fromTo(showcaseCode, { opacity: 0, scale: 0.95 }, {
@@ -152,7 +185,6 @@ function App() {
       })
     }
 
-    // Parallax for hero orbs
     document.querySelectorAll<HTMLElement>('.hero-orb').forEach((orb) => {
       gsap.to(orb, {
         y: -80,
@@ -166,7 +198,6 @@ function App() {
     }
   }, [])
 
-  // Active nav
   useEffect(() => {
     const sections = document.querySelectorAll('section[id]')
     const navLinks = document.querySelectorAll<HTMLElement>('.nav-link')
@@ -190,17 +221,25 @@ function App() {
     return () => window.removeEventListener('scroll', updateNav)
   }, [])
 
+  const currentYear = new Date().getFullYear()
+
   return (
     <>
+      {loading && (
+        <div className="loading-screen">
+          <div className="loading-spinner" />
+        </div>
+      )}
+
       <MacBookScene />
 
-      {/* NAVBAR */}
       <nav className="navbar" ref={navbarRef}>
         <div className="container">
           <div className="nav-inner">
             <a href="#" className="nav-logo">qqwozz</a>
             <div className="nav-links">
               <a href="#about" className="nav-link">обо мне</a>
+              <a href="#experience" className="nav-link">опыт</a>
               <a href="#projects" className="nav-link">проекты</a>
               <a href="#stack" className="nav-link">стек</a>
               <a href="#contact" className="nav-link">связаться</a>
@@ -210,7 +249,6 @@ function App() {
         </div>
       </nav>
 
-      {/* HERO */}
       <section className="hero" id="hero">
         <div className="hero-glow" />
         <div className="hero-code-bg">{`from fastapi import FastAPI
@@ -239,14 +277,13 @@ async def execute_trade(trade: Trade):
           <h1 className="hero-title" data-scrub-hero>QQWOZZ</h1>
           <p className="hero-subtitle" data-scrub-hero-sub>back-end developer</p>
         </div>
-        <div className="scroll-indicator">
+        <div className="scroll-indicator" ref={scrollIndicatorRef}>
           <div className="scroll-line" />
         </div>
       </section>
 
       <div className="divider" />
 
-      {/* SCRUB SECTION 1 */}
       <section className="section">
         <div className="container">
           <p className="scrub-each-word" scrub-each-word="">всё начинается с</p>
@@ -254,13 +291,12 @@ async def execute_trade(trade: Trade):
         </div>
       </section>
 
-      {/* SHOWCASE */}
       <section className="showcase">
         <div className="container">
           <div className="showcase-inner">
             <div className="showcase-image reveal-el">
               <div className="showcase-code">
-                <span className="comment">// qqwozz @ 2024</span><br />
+                <span className="comment">// qqwozz @ {currentYear}</span><br />
                 <span className="keyword">const</span> developer = {'{'}<br />
                 &nbsp;&nbsp;name: <span className="string">"Dima Kiselev"</span>,<br />
                 &nbsp;&nbsp;role: <span className="string">"back-end developer"</span>,<br />
@@ -277,7 +313,6 @@ async def execute_trade(trade: Trade):
 
       <div className="divider" />
 
-      {/* ABOUT */}
       <section className="section" id="about">
         <div className="container">
           <div className="section-number">001</div>
@@ -294,19 +329,19 @@ async def execute_trade(trade: Trade):
             </div>
             <div className="about-stats reveal-el">
               <div className="stat-cell">
-                <div className="stat-number" data-count="17">0</div>
+                <div className="stat-number" data-count={stats.repos}>0</div>
                 <div className="stat-label">репозиториев</div>
               </div>
               <div className="stat-cell">
-                <div className="stat-number" data-count="13">0</div>
+                <div className="stat-number" data-count={stats.stars}>0</div>
                 <div className="stat-label">звёзд</div>
               </div>
               <div className="stat-cell">
-                <div className="stat-number" data-count="4">0</div>
+                <div className="stat-number" data-count={stats.followers}>0</div>
                 <div className="stat-label">фолловеров</div>
               </div>
               <div className="stat-cell">
-                <div className="stat-number" data-count="6">0</div>
+                <div className="stat-number" data-count={stats.languages}>0</div>
                 <div className="stat-label">языков</div>
               </div>
             </div>
@@ -316,10 +351,58 @@ async def execute_trade(trade: Trade):
 
       <div className="divider" />
 
-      {/* FEATURES */}
-      <section className="section" id="features">
+      {/* EXPERIENCE */}
+      <section className="section" id="experience">
         <div className="container">
           <div className="section-number">002</div>
+          <p className="scrub-each-word" scrub-each-word="">опыт работы</p>
+          <div className="experience-list reveal-el">
+            <div className="experience-card">
+              <div className="experience-header">
+                <div className="experience-role">backend-разработчик (стажёр)</div>
+                <div className="experience-company">Яндекс</div>
+              </div>
+              <div className="experience-desc">
+                разработка и поддержка backend-сервисов в рамках поисковой инфраструктуры.
+                участие в проектировании API, написание модульных и интеграционных тестов.
+                оптимизация производительности серверных компонентов, работа с распределёнными системами
+                и очередями сообщений. code review, документирование, взаимодействие с командой.
+              </div>
+              <div className="experience-tags">
+                <span className="experience-tag">Python</span>
+                <span className="experience-tag">C++</span>
+                <span className="experience-tag">microservices</span>
+                <span className="experience-tag">gRPC</span>
+              </div>
+            </div>
+
+            <div className="experience-card">
+              <div className="experience-header">
+                <div className="experience-role">backend-разработчик (стажёр)</div>
+                <div className="experience-company">VTB</div>
+              </div>
+              <div className="experience-desc">
+                разработка микросервисов для внутренних банковских систем.
+                проектирование и реализация REST API для обработки платёжных операций.
+                интеграция с существующей инфраструктурой, работа с реляционными базами данных,
+                написание высоконагруженных компонентов с учётом требований безопасности и отказоустойчивости.
+              </div>
+              <div className="experience-tags">
+                <span className="experience-tag">Python</span>
+                <span className="experience-tag">Go</span>
+                <span className="experience-tag">PostgreSQL</span>
+                <span className="experience-tag">Docker</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <div className="divider" />
+
+      <section className="section" id="features">
+        <div className="container">
+          <div className="section-number">003</div>
           <p className="scrub-each-word" scrub-each-word="">что я умею</p>
           <div className="features-grid reveal-el">
             <div className="feature-cell">
@@ -348,14 +431,12 @@ async def execute_trade(trade: Trade):
 
       <div className="divider" />
 
-      {/* SCRUB SECTION 2 */}
       <section className="section">
         <div className="container">
           <p className="scrub-text" scrub-text="">точность без<br />усилий</p>
         </div>
       </section>
 
-      {/* DETAIL CARDS */}
       <section className="section">
         <div className="container">
           <div className="detail-cards">
@@ -383,7 +464,6 @@ async def execute_trade(trade: Trade):
 
       <div className="divider" />
 
-      {/* SCRUB SECTION 3 */}
       <section className="section">
         <div className="container">
           <p className="scrub-each-word" scrub-each-word="">всё в</p>
@@ -391,10 +471,9 @@ async def execute_trade(trade: Trade):
         </div>
       </section>
 
-      {/* PROJECTS */}
       <section className="section" id="projects">
         <div className="container">
-          <div className="section-number">003</div>
+          <div className="section-number">004</div>
           <p className="scrub-each-word" scrub-each-word="">избранные проекты</p>
           <div className="projects-list reveal-el">
             <a className="project-row" href="https://github.com/qqwozz/QW_Trading_Platform" target="_blank" rel="noreferrer">
@@ -433,10 +512,9 @@ async def execute_trade(trade: Trade):
 
       <div className="divider" />
 
-      {/* SKILLS */}
       <section className="section" id="skills">
         <div className="container">
-          <div className="section-number">004</div>
+          <div className="section-number">005</div>
           <p className="scrub-each-word" scrub-each-word="">технологии</p>
           <div className="skills-row reveal-el">
             <div className="skill-cell">
@@ -487,10 +565,9 @@ async def execute_trade(trade: Trade):
 
       <div className="divider" />
 
-      {/* STACK TABLE */}
       <section className="section" id="stack">
         <div className="container">
-          <div className="section-number">005</div>
+          <div className="section-number">006</div>
           <p className="scrub-each-word" scrub-each-word="">полный стек</p>
           <div className="stack-table reveal-el">
             <div className="stack-row">
@@ -519,34 +596,32 @@ async def execute_trade(trade: Trade):
 
       <div className="divider" />
 
-      {/* CONTACT */}
       <section className="section" id="contact">
         <div className="contact-block">
           <p className="scrub-text" scrub-text="">связаться<br />со мной</p>
           <div style={{ marginTop: 56 }}>
             <div className="contact-links reveal-el">
-              <a href="mailto:qqwozz@example.com" className="contact-link">
-                <svg viewBox="0 0 24 24"><path d="M20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z" /></svg>
-                email
+              <a href="https://t.me/qwwozzz" target="_blank" rel="noreferrer" className="contact-link">
+                <svg viewBox="0 0 24 24"><path d="M11.944 0A12 12 0 000 12a12 12 0 0012 12 12 12 0 0012-12A12 12 0 0012 0h-.056zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 01.171.325c.016.093.036.306.02.472-.18 1.898-.962 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.479.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z" /></svg>
+                telegram
               </a>
               <a href="https://github.com/qqwozz" target="_blank" rel="noreferrer" className="contact-link">
                 <svg viewBox="0 0 24 24"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z" /></svg>
                 github
               </a>
-              <a href="https://t.me/qwwozzz" target="_blank" rel="noreferrer" className="contact-link">
-                <svg viewBox="0 0 24 24"><path d="M11.944 0A12 12 0 000 12a12 12 0 0012 12 12 12 0 0012-12A12 12 0 0012 0h-.056zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 01.171.325c.016.093.036.306.02.472-.18 1.898-.962 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.479.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z" /></svg>
-                telegram @qwwozzz
+              <a href="mailto:qqwozz@proton.me" className="contact-link">
+                <svg viewBox="0 0 24 24"><path d="M20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z" /></svg>
+                email
               </a>
             </div>
           </div>
         </div>
       </section>
 
-      {/* FOOTER */}
       <footer className="footer">
         <div className="container">
           <div className="footer-inner">
-            <span className="footer-copy">все права защищены</span>
+            <span className="footer-copy">&copy; {currentYear} qqwozz</span>
             <div className="footer-links">
               <a href="https://github.com/qqwozz" target="_blank" rel="noreferrer">github</a>
               <a href="https://t.me/qwwozzz" target="_blank" rel="noreferrer">telegram</a>
@@ -555,6 +630,14 @@ async def execute_trade(trade: Trade):
           </div>
         </div>
       </footer>
+
+      <button
+        className={`back-to-top${showTopBtn ? ' visible' : ''}`}
+        onClick={() => window.scrollTo({ top: 0 })}
+        aria-label="Наверх"
+      >
+        <svg viewBox="0 0 24 24"><polyline points="18 15 12 9 6 15" /></svg>
+      </button>
     </>
   )
 }

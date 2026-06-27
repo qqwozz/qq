@@ -1,5 +1,5 @@
-import { useRef, useEffect, Suspense } from 'react'
-import { Canvas, useFrame } from '@react-three/fiber'
+import { useRef, useEffect, Suspense, useState } from 'react'
+import { Canvas, useFrame, useThree } from '@react-three/fiber'
 import { useGLTF, Environment } from '@react-three/drei'
 import * as THREE from 'three'
 
@@ -33,14 +33,46 @@ function Loader() {
   return null
 }
 
+function VisibilityPause() {
+  const { gl } = useThree()
+  const containerRef = useRef<HTMLElement | null>(null)
+
+  useEffect(() => {
+    containerRef.current = gl.domElement.parentElement
+    if (!containerRef.current) return
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        gl.domElement.style.display = entry.isIntersecting ? '' : 'none'
+      },
+      { threshold: 0 }
+    )
+
+    observer.observe(containerRef.current)
+    return () => observer.disconnect()
+  }, [gl])
+
+  return null
+}
+
 export default function MacBookScene() {
+  const [visible, setVisible] = useState(false)
+
+  useEffect(() => {
+    const timer = setTimeout(() => setVisible(true), 100)
+    return () => clearTimeout(timer)
+  }, [])
+
+  if (!visible) return null
+
   return (
     <div className="three-canvas-container">
       <Canvas
         camera={{ position: [0, 1.5, 4], fov: 50 }}
         gl={{ antialias: true, alpha: true }}
         style={{ background: 'transparent' }}
-        dpr={[1, 2]}
+        dpr={[1, 1.5]}
+        frameloop="always"
       >
         <ambientLight intensity={0.4} />
         <directionalLight position={[5, 8, 5]} intensity={1.5} color="#ffffff" />
@@ -51,6 +83,8 @@ export default function MacBookScene() {
           <MacBookModel />
           <Environment preset="night" />
         </Suspense>
+
+        <VisibilityPause />
       </Canvas>
     </div>
   )
