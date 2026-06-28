@@ -8,6 +8,10 @@ function App() {
   const backToTopRef = useRef<HTMLButtonElement>(null)
   const mobileMenuRef = useRef<HTMLDivElement>(null)
   const cursorRef = useRef<HTMLDivElement>(null)
+  const progressRef = useRef<HTMLDivElement>(null)
+  const ringRef = useRef<SVGCircleElement>(null)
+  const heroTitleRef = useRef<HTMLHeadingElement>(null)
+  const heroSubRef = useRef<HTMLParagraphElement>(null)
   const [loading, setLoading] = useState(true)
   const [loadingFade, setLoadingFade] = useState(false)
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
@@ -19,6 +23,17 @@ function App() {
 
   const handleScroll = useCallback(() => {
     const scrollTop = window.scrollY
+    const docHeight = document.documentElement.scrollHeight - window.innerHeight
+    const progress = docHeight > 0 ? scrollTop / docHeight : 0
+
+    if (progressRef.current) {
+      progressRef.current.style.transform = `scaleX(${progress})`
+    }
+
+    if (ringRef.current) {
+      const circumference = 2 * Math.PI * 18
+      ringRef.current.style.strokeDashoffset = String(circumference * (1 - progress))
+    }
 
     if (navbarRef.current) {
       navbarRef.current.classList.toggle('scrolled', scrollTop > 50)
@@ -104,6 +119,56 @@ function App() {
     return () => { cancelAnimationFrame(raf); window.removeEventListener('mousemove', onMove) }
   }, [ready])
 
+  // Text scramble on hero title
+  useEffect(() => {
+    if (!ready || !heroTitleRef.current) return
+    const el = heroTitleRef.current
+    const target = 'Дима Киселев'
+    const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%'
+    let iteration = 0
+    const totalIterations = target.length * 3
+
+    const interval = setInterval(() => {
+      el.textContent = target
+        .split('')
+        .map((ch, i) => {
+          if (i < iteration / 3) return ch
+          return chars[Math.floor(Math.random() * chars.length)]
+        })
+        .join('')
+
+      iteration++
+      if (iteration >= totalIterations) {
+        el.textContent = target
+        clearInterval(interval)
+      }
+    }, 30)
+
+    return () => clearInterval(interval)
+  }, [ready])
+
+  // Typing effect on subtitle
+  useEffect(() => {
+    if (!ready || !heroSubRef.current) return
+    const el = heroSubRef.current
+    const target = 'back-end developer'
+    let i = 0
+    el.textContent = ''
+
+    const timeout = setTimeout(() => {
+      const type = () => {
+        if (i <= target.length) {
+          el.textContent = target.slice(0, i) + (i < target.length ? '|' : '')
+          i++
+          setTimeout(type, 70)
+        }
+      }
+      type()
+    }, 1200)
+
+    return () => clearTimeout(timeout)
+  }, [ready])
+
   // IntersectionObserver for reveals
   useEffect(() => {
     if (!ready) return
@@ -150,6 +215,27 @@ function App() {
       requestAnimationFrame(tick)
     })
   }, [ready, stats])
+
+  // Hover glow on cards
+  useEffect(() => {
+    if (!ready) return
+    const cards = document.querySelectorAll<HTMLElement>('.stat-cell, .feature-cell, .skill-cell, .experience-card, .project-row')
+    const cleanup: (() => void)[] = []
+
+    cards.forEach((card) => {
+      const onMove = (e: MouseEvent) => {
+        const rect = card.getBoundingClientRect()
+        const x = e.clientX - rect.left
+        const y = e.clientY - rect.top
+        card.style.setProperty('--gx', `${x}px`)
+        card.style.setProperty('--gy', `${y}px`)
+      }
+      card.addEventListener('mousemove', onMove)
+      cleanup.push(() => card.removeEventListener('mousemove', onMove))
+    })
+
+    return () => cleanup.forEach((fn) => fn())
+  }, [ready])
 
   // Magnetic cards — 3D tilt toward cursor
   useEffect(() => {
@@ -316,6 +402,16 @@ function App() {
 
       <div className="cursor-dot" ref={cursorRef} />
       <div className="noise-overlay" />
+      <div className="progress-bar" ref={progressRef} />
+
+      <div className="scroll-ring">
+        <svg viewBox="0 0 44 44">
+          <circle cx="22" cy="22" r="18" fill="none" stroke="rgba(255,255,255,0.08)" strokeWidth="2" />
+          <circle cx="22" cy="22" r="18" fill="none" stroke="rgba(255,255,255,0.5)" strokeWidth="2"
+            strokeDasharray={2 * Math.PI * 18} strokeDashoffset={2 * Math.PI * 18}
+            strokeLinecap="round" ref={ringRef} transform="rotate(-90 22 22)" />
+        </svg>
+      </div>
 
       <nav className="navbar" ref={navbarRef}>
         <div className="container">
@@ -354,8 +450,8 @@ function App() {
         <MacBookScene />
         <div className="hero-glow" />
         <div className="hero-content">
-          <h1 className="hero-title">Дима Киселев</h1>
-          <p className="hero-subtitle">back-end developer</p>
+          <h1 className="hero-title" ref={heroTitleRef}>Дима Киселев</h1>
+          <p className="hero-subtitle" ref={heroSubRef}></p>
         </div>
         <div className="scroll-indicator" ref={scrollIndicatorRef}>
           <div className="scroll-line" />
@@ -380,19 +476,19 @@ function App() {
             </div>
             <div className="about-stats anim">
               <div className="stat-cell">
-                <div className="stat-number" data-target={stats.repos}>0</div>
+                <div className="stat-number" data-target={stats.repos}>{stats.repos || <span className="skeleton" />}</div>
                 <div className="stat-label">репозиториев</div>
               </div>
               <div className="stat-cell">
-                <div className="stat-number" data-target={stats.stars}>0</div>
+                <div className="stat-number" data-target={stats.stars}>{stats.stars || <span className="skeleton" />}</div>
                 <div className="stat-label">звёзд</div>
               </div>
               <div className="stat-cell">
-                <div className="stat-number" data-target={stats.followers}>0</div>
+                <div className="stat-number" data-target={stats.followers}>{stats.followers || <span className="skeleton" />}</div>
                 <div className="stat-label">фолловеров</div>
               </div>
               <div className="stat-cell">
-                <div className="stat-number" data-target={stats.languages}>0</div>
+                <div className="stat-number" data-target={stats.languages}>{stats.languages}</div>
                 <div className="stat-label">языков</div>
               </div>
             </div>

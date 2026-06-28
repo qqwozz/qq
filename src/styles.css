@@ -389,6 +389,85 @@ body::before {
     .cursor-dot { display: none; }
 }
 
+/* ========== PROGRESS BAR ========== */
+.progress-bar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 2px;
+    background: rgba(255, 255, 255, 0.6);
+    transform: scaleX(0);
+    transform-origin: left;
+    z-index: 200;
+    will-change: transform;
+}
+
+/* ========== SCROLL RING ========== */
+.scroll-ring {
+    position: fixed;
+    bottom: 28px;
+    right: 28px;
+    width: 44px;
+    height: 44px;
+    z-index: 90;
+    pointer-events: none;
+    opacity: 0.6;
+}
+
+.scroll-ring svg {
+    width: 100%;
+    height: 100%;
+}
+
+/* ========== SKELETON ========== */
+.skeleton {
+    display: inline-block;
+    width: 40px;
+    height: 0.7em;
+    background: linear-gradient(90deg, rgba(255,255,255,0.06) 25%, rgba(255,255,255,0.12) 50%, rgba(255,255,255,0.06) 75%);
+    background-size: 200% 100%;
+    animation: shimmer 1.5s ease-in-out infinite;
+    border-radius: 4px;
+    vertical-align: middle;
+}
+
+@keyframes shimmer {
+    0% { background-position: 200% 0; }
+    100% { background-position: -200% 0; }
+}
+
+/* ========== HOVER GLOW ========== */
+.stat-cell,
+.feature-cell,
+.skill-cell,
+.experience-card,
+.project-row {
+    --gx: 50%;
+    --gy: 50%;
+}
+
+.stat-cell::after,
+.feature-cell::after,
+.experience-card::after,
+.project-row::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(circle 120px at var(--gx) var(--gy), rgba(255,255,255,0.06) 0%, transparent 100%);
+    pointer-events: none;
+    border-radius: inherit;
+    opacity: 0;
+    transition: opacity var(--duration-normal) var(--ease-out);
+}
+
+.stat-cell:hover::after,
+.feature-cell:hover::after,
+.experience-card:hover::after,
+.project-row:hover::after {
+    opacity: 1;
+}
+
 /* ========== NOISE OVERLAY ========== */
 .noise-overlay {
     position: fixed;
@@ -661,12 +740,20 @@ body::before {
 .experience-card::after {
     content: '';
     position: absolute;
-    top: 0;
-    left: 0;
-    width: 2px;
-    height: 0;
-    background: var(--text-primary);
-    transition: height var(--duration-slow) var(--ease-out);
+    inset: 0;
+    background:
+        linear-gradient(90deg, var(--text-primary) 0%, var(--text-primary) 2px, transparent 2px) no-repeat 0 0,
+        radial-gradient(circle 120px at var(--gx) var(--gy), rgba(255,255,255,0.06) 0%, transparent 100%);
+    pointer-events: none;
+    border-radius: inherit;
+    background-size: 2px 0%, 100% 100%;
+    opacity: 0;
+    transition: background-size var(--duration-slow) var(--ease-out), opacity var(--duration-normal) var(--ease-out);
+}
+
+.experience-card:hover::after {
+    background-size: 2px 100%, 100% 100%;
+    opacity: 1;
 }
 
 .experience-card:hover {
@@ -769,11 +856,12 @@ body::before {
 .feature-cell::after {
     content: '';
     position: absolute;
-    bottom: 0;
-    left: 0;
-    width: 100%;
-    height: 1px;
-    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.12), transparent);
+    inset: 0;
+    background:
+        linear-gradient(180deg, transparent 99%, rgba(255,255,255,0.12) 100%),
+        radial-gradient(circle 120px at var(--gx) var(--gy), rgba(255,255,255,0.06) 0%, transparent 100%);
+    pointer-events: none;
+    border-radius: inherit;
     opacity: 0;
     transition: opacity var(--duration-normal) var(--ease-out);
 }
