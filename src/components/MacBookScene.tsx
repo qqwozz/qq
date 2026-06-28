@@ -11,20 +11,25 @@ function MacBookModel() {
     scene.traverse((child) => {
       if ((child as THREE.Mesh).isMesh) {
         const mesh = child as THREE.Mesh
-        mesh.castShadow = true
-        mesh.receiveShadow = true
+        mesh.castShadow = false
+        mesh.receiveShadow = false
+        if (mesh.material) {
+          const mat = mesh.material as THREE.MeshStandardMaterial
+          if (mat.map) mat.map.colorSpace = THREE.SRGBColorSpace
+          mat.envMapIntensity = 0.5
+        }
       }
     })
   }, [scene])
 
   useFrame((_, delta) => {
     if (!group.current) return
-    group.current.rotation.y -= delta * 0.3
+    group.current.rotation.y -= delta * 0.25
     invalidate()
   })
 
   return (
-    <group ref={group} scale={1.8}>
+    <group ref={group} scale={1.6} position={[0, -0.3, 0]}>
       <primitive object={scene} />
     </group>
   )
@@ -61,7 +66,7 @@ export default function MacBookScene() {
   const [visible, setVisible] = useState(false)
 
   useEffect(() => {
-    const timer = setTimeout(() => setVisible(true), 100)
+    const timer = setTimeout(() => setVisible(true), 200)
     return () => clearTimeout(timer)
   }, [])
 
@@ -70,20 +75,25 @@ export default function MacBookScene() {
   return (
     <div className="three-canvas-container">
       <Canvas
-        camera={{ position: [0, 1.5, 4], fov: 50 }}
-        gl={{ antialias: true, alpha: true }}
+        camera={{ position: [0, 1.2, 3.8], fov: 45 }}
+        gl={{
+          antialias: false,
+          alpha: true,
+          powerPreference: 'high-performance',
+          stencil: false,
+          depth: true,
+        }}
         style={{ background: 'transparent' }}
-        dpr={[1, 1.5]}
+        dpr={[1, 1.2]}
         frameloop="demand"
       >
-        <ambientLight intensity={0.4} />
-        <directionalLight position={[5, 8, 5]} intensity={1.5} color="#ffffff" />
-        <directionalLight position={[-5, 3, -5]} intensity={0.5} color="#ffffff" />
-        <pointLight position={[0, 5, 0]} intensity={0.8} color="#ffffff" distance={15} />
+        <ambientLight intensity={0.3} />
+        <directionalLight position={[5, 8, 5]} intensity={1.2} color="#ffffff" />
+        <directionalLight position={[-3, 4, -3]} intensity={0.4} color="#ffffff" />
 
         <Suspense fallback={null}>
           <MacBookModel />
-          <Environment preset="night" />
+          <Environment preset="night" environmentIntensity={0.3} />
         </Suspense>
 
         <VisibilityPause />

@@ -110,8 +110,8 @@ function App() {
   }, [mobileMenuOpen])
 
   useEffect(() => {
-    const t1 = setTimeout(() => setLoadingFade(true), 1000)
-    const t2 = setTimeout(() => setLoading(false), 1500)
+    const t1 = setTimeout(() => setLoadingFade(true), 800)
+    const t2 = setTimeout(() => setLoading(false), 1400)
     return () => { clearTimeout(t1); clearTimeout(t2) }
   }, [])
 
