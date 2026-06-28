@@ -49,6 +49,9 @@ function App() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const [stats, setStats] = useState({ repos: 0, stars: 0, followers: 0, languages: 6 })
 
+  const sectionsRef = useRef<HTMLElement[]>([])
+  const navLinksRef = useRef<HTMLElement[]>([])
+
   const handleScroll = useCallback(() => {
     const scrollTop = window.scrollY
 
@@ -64,15 +67,18 @@ function App() {
       backToTopRef.current.classList.toggle('visible', scrollTop > 600)
     }
 
-    const sections = document.querySelectorAll<HTMLElement>('section[id]')
-    const navLinks = document.querySelectorAll<HTMLElement>('.nav-link')
+    if (!sectionsRef.current.length) {
+      sectionsRef.current = Array.from(document.querySelectorAll<HTMLElement>('section[id]'))
+      navLinksRef.current = Array.from(document.querySelectorAll<HTMLElement>('.nav-link'))
+    }
+
     let current = ''
-    sections.forEach((s) => {
+    for (const s of sectionsRef.current) {
       if (scrollTop >= s.offsetTop - 200) {
         current = s.id
       }
-    })
-    navLinks.forEach((link) => {
+    }
+    navLinksRef.current.forEach((link) => {
       link.style.color = link.getAttribute('href') === '#' + current ? '#fff' : ''
     })
   }, [])
@@ -127,7 +133,9 @@ function App() {
       .then((r) => r.json())
       .then((repos) => {
         if (Array.isArray(repos)) {
-          const totalStars = repos.reduce((sum: number, r: any) => sum + (r.stargazers_count ?? 0), 0)
+          const totalStars = repos.reduce(
+            (sum: number, r: { stargazers_count?: number }) => sum + (r.stargazers_count ?? 0), 0
+          )
           setStats((s) => ({ ...s, stars: totalStars }))
         }
       })
@@ -141,6 +149,8 @@ function App() {
     initScrubAnimation('[scrub-text]', scrubFrom, scrubTo)
     initScrubAnimation('[scrub-each-word]', scrubFrom, scrubTo)
 
+    const tweens: gsap.core.Tween[] = []
+
     const heroTitle = document.querySelector<HTMLElement>('[data-scrub-hero]')
     if (heroTitle) {
       const text = heroTitle.textContent!
@@ -151,33 +161,24 @@ function App() {
         s.style.display = 'inline-block'
         heroTitle.appendChild(s)
       })
-      gsap.fromTo(
+      tweens.push(gsap.fromTo(
         heroTitle.querySelectorAll('span'),
         { opacity: 0, y: 50 },
         { opacity: 1, y: 0, duration: 1.2, stagger: 0.07, ease: 'back.out(1.4)', delay: 0.3 }
-      )
+      ))
     }
 
     const heroSub = document.querySelector<HTMLElement>('[data-scrub-hero-sub]')
     if (heroSub) {
-      gsap.fromTo(heroSub, { opacity: 0, y: 20 }, {
+      tweens.push(gsap.fromTo(heroSub, { opacity: 0, y: 20 }, {
         opacity: 1, y: 0, duration: 1, delay: 1.2, ease: 'power3.out',
-      })
+      }))
     }
 
     document.querySelectorAll<HTMLElement>('.reveal-el').forEach((el) => {
       gsap.fromTo(el, { opacity: 0, y: 60 }, {
         opacity: 1, y: 0, duration: 1.2, ease: 'power3.out',
         scrollTrigger: { trigger: el, start: 'top 88%' },
-      })
-    })
-
-    document.querySelectorAll<HTMLElement>('[data-count]').forEach((counter) => {
-      const target = parseInt(counter.getAttribute('data-count')!)
-      gsap.fromTo(counter, { textContent: '0' }, {
-        textContent: target.toString(), duration: 2, ease: 'power2.out',
-        snap: { textContent: 1 },
-        scrollTrigger: { trigger: counter, start: 'top 85%' },
       })
     })
 
@@ -197,9 +198,26 @@ function App() {
     })
 
     return () => {
+      tweens.forEach((t) => t.kill())
       ScrollTrigger.getAll().forEach((t) => t.kill())
     }
   }, [])
+
+  useEffect(() => {
+    if (stats.repos === 0 && stats.stars === 0 && stats.followers === 0) return
+
+    document.querySelectorAll<HTMLElement>('[data-count]').forEach((counter) => {
+      if (counter.dataset.animated) return
+      const target = parseInt(counter.getAttribute('data-count')!)
+      if (isNaN(target) || target === 0) return
+      counter.dataset.animated = '1'
+      gsap.fromTo(counter, { textContent: '0' }, {
+        textContent: target.toString(), duration: 2, ease: 'power2.out',
+        snap: { textContent: 1 },
+        scrollTrigger: { trigger: counter, start: 'top 85%' },
+      })
+    })
+  }, [stats])
 
   const currentYear = new Date().getFullYear()
 

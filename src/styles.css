@@ -213,11 +213,12 @@ body::before {
 
 .hero-title {
     font-family: 'Inder', sans-serif;
-    font-size: clamp(70px, 14vw, 180px);
+    font-size: clamp(48px, 8vw, 120px);
     font-weight: 400;
-    letter-spacing: 16px;
-    line-height: 1;
+    letter-spacing: 6px;
+    line-height: 1.1;
     text-transform: uppercase;
+    white-space: nowrap;
     text-shadow: 0 0 80px rgba(255, 255, 255, 0.15),
                  0 0 160px rgba(255, 255, 255, 0.05);
 }
@@ -317,11 +318,12 @@ body::before {
     margin: 0 auto;
     animation: scrollPulse 2.5s ease-in-out infinite;
     box-shadow: 0 0 10px rgba(255, 255, 255, 0.1);
+    transform-origin: top center;
 }
 
 @keyframes scrollPulse {
-    0%, 100% { opacity: 0.2; height: 50px; box-shadow: 0 0 5px rgba(255, 255, 255, 0.05); }
-    50% { opacity: 1; height: 70px; box-shadow: 0 0 15px rgba(255, 255, 255, 0.15); }
+    0%, 100% { opacity: 0.2; transform: scaleY(0.7); box-shadow: 0 0 5px rgba(255, 255, 255, 0.05); }
+    50% { opacity: 1; transform: scaleY(1); box-shadow: 0 0 15px rgba(255, 255, 255, 0.15); }
 }
 
 /* ========== SECTIONS ========== */
@@ -941,7 +943,7 @@ body::before {
 }
 
 @media (max-width: 600px) {
-    .hero-title { letter-spacing: 6px; }
+    .hero-title { letter-spacing: 3px; }
     .features-grid { grid-template-columns: 1fr; }
     .about-stats { grid-template-columns: 1fr; }
     .skills-row, .skills-row-2 { grid-template-columns: 1fr; }

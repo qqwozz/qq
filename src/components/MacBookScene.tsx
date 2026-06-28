@@ -4,8 +4,8 @@ import { useGLTF, Environment } from '@react-three/drei'
 import * as THREE from 'three'
 
 function MacBookModel() {
-  const { scene } = useGLTF(`${import.meta.env.BASE_URL}MacBook%20Ultra.glb`)
-  const group = useRef<THREE.Group>(null!)
+  const { scene, invalidate } = useThree()
+  const group = useRef<THREE.Group>(null)
 
   useEffect(() => {
     scene.traverse((child) => {
@@ -19,7 +19,8 @@ function MacBookModel() {
 
   useFrame((_, delta) => {
     if (!group.current) return
-    group.current.rotation.y += delta * 0.3
+    group.current.rotation.y -= delta * 0.3
+    invalidate()
   })
 
   return (
@@ -29,12 +30,8 @@ function MacBookModel() {
   )
 }
 
-function Loader() {
-  return null
-}
-
 function VisibilityPause() {
-  const { gl } = useThree()
+  const { gl, invalidate } = useThree()
   const containerRef = useRef<HTMLElement | null>(null)
 
   useEffect(() => {
@@ -43,14 +40,19 @@ function VisibilityPause() {
 
     const observer = new IntersectionObserver(
       ([entry]) => {
-        gl.domElement.style.display = entry.isIntersecting ? '' : 'none'
+        if (entry.isIntersecting) {
+          gl.domElement.style.display = ''
+          invalidate()
+        } else {
+          gl.domElement.style.display = 'none'
+        }
       },
       { threshold: 0 }
     )
 
     observer.observe(containerRef.current)
     return () => observer.disconnect()
-  }, [gl])
+  }, [gl, invalidate])
 
   return null
 }
@@ -79,7 +81,7 @@ export default function MacBookScene() {
         <directionalLight position={[-5, 3, -5]} intensity={0.5} color="#ffffff" />
         <pointLight position={[0, 5, 0]} intensity={0.8} color="#ffffff" distance={15} />
 
-        <Suspense fallback={<Loader />}>
+        <Suspense fallback={null}>
           <MacBookModel />
           <Environment preset="night" />
         </Suspense>
