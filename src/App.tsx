@@ -97,28 +97,41 @@ function App() {
     const el = document.querySelector<HTMLElement>('.macbook-scene')
     if (!el) return
 
-    let ticking = false
-    const onScroll = () => {
-      if (ticking) return
-      ticking = true
-      requestAnimationFrame(() => {
-        const scrollY = window.scrollY
-        const vh = window.innerHeight
-        const progress = Math.min(scrollY / (vh * 0.9), 1)
-        const ease = 1 - Math.pow(1 - progress, 3)
+    let current = { ty: -30, scale: 1, opacity: 1 }
+    let target = { ty: -30, scale: 1, opacity: 1 }
+    let raf = 0
 
-        const ty = -30 + ease * 80
-        const scale = 1 - ease * 0.25
-        const opacity = 1 - ease * 0.5
+    const lerp = (a: number, b: number, t: number) => a + (b - a) * t
 
-        el.style.transform = `translate(-50%, ${ty}%) scale(${scale})`
-        el.style.opacity = String(opacity)
-        ticking = false
-      })
+    const animate = () => {
+      current.ty = lerp(current.ty, target.ty, 0.08)
+      current.scale = lerp(current.scale, target.scale, 0.08)
+      current.opacity = lerp(current.opacity, target.opacity, 0.08)
+
+      el.style.transform = `translate(-50%, ${current.ty}%) scale(${current.scale})`
+      el.style.opacity = String(current.opacity)
+
+      raf = requestAnimationFrame(animate)
     }
 
+    const onScroll = () => {
+      const scrollY = window.scrollY
+      const vh = window.innerHeight
+      const p = Math.min(scrollY / (vh * 0.85), 1)
+      const ease = p < 0.5 ? 2 * p * p : 1 - Math.pow(-2 * p + 2, 2) / 2
+
+      target.ty = -30 + ease * 90
+      target.scale = 1 - ease * 0.3
+      target.opacity = 1 - ease * 0.55
+    }
+
+    raf = requestAnimationFrame(animate)
     window.addEventListener('scroll', onScroll, { passive: true })
-    return () => window.removeEventListener('scroll', onScroll)
+
+    return () => {
+      cancelAnimationFrame(raf)
+      window.removeEventListener('scroll', onScroll)
+    }
   }, [ready])
 
   useEffect(() => {
