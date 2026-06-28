@@ -8,7 +8,6 @@ function App() {
   const backToTopRef = useRef<HTMLButtonElement>(null)
   const mobileMenuRef = useRef<HTMLDivElement>(null)
   const progressRef = useRef<HTMLDivElement>(null)
-  const ringRef = useRef<SVGCircleElement>(null)
   const heroTitleRef = useRef<HTMLHeadingElement>(null)
   const heroSubRef = useRef<HTMLParagraphElement>(null)
   const [loading, setLoading] = useState(true)
@@ -27,11 +26,6 @@ function App() {
 
     if (progressRef.current) {
       progressRef.current.style.transform = `scaleX(${progress})`
-    }
-
-    if (ringRef.current) {
-      const circumference = 2 * Math.PI * 18
-      ringRef.current.style.strokeDashoffset = String(circumference * (1 - progress))
     }
 
     if (navbarRef.current) {
@@ -363,14 +357,37 @@ function App() {
       })
       .catch(() => {})
 
-    fetch('https://leetcode-stats-api.herokuapp.com/oonixxxxx')
+    fetch('https://api.github.com/users/qqwozz')
       .then((r) => r.json())
       .then((data) => {
-        if (data && data.totalSolved) {
-          setStats((s) => ({ ...s, leetcode: data.totalSolved }))
+        if (data) {
+          setStats((s) => ({
+            ...s,
+            followers: data.followers ?? s.followers,
+          }))
         }
       })
       .catch(() => {})
+
+    const tryLeetCodeAPIs = [
+      'https://leetcode-stats-api.herokuapp.com/oonixxxxx',
+      'https://alfa-leetcode-api.onrender.com/oonixxxxx/solved',
+      'https://leetcode-api-faisalshohag.vercel.app/oonixxxxx',
+    ]
+
+    const tryLeetCode = async () => {
+      for (const url of tryLeetCodeAPIs) {
+        try {
+          const res = await fetch(url, { signal: AbortSignal.timeout(4000) })
+          const data = await res.json()
+          if (data && (data.totalSolved || data.solved || data.totalQuestions)) {
+            setStats((s) => ({ ...s, leetcode: data.totalSolved || data.solved || 0 }))
+            return
+          }
+        } catch { continue }
+      }
+    }
+    tryLeetCode()
   }, [])
 
   const currentYear = new Date().getFullYear()
@@ -388,15 +405,6 @@ function App() {
 
       <div className="noise-overlay" />
       <div className="progress-bar" ref={progressRef} />
-
-      <div className="scroll-ring">
-        <svg viewBox="0 0 44 44">
-          <circle cx="22" cy="22" r="18" fill="none" stroke="rgba(255,255,255,0.08)" strokeWidth="2" />
-          <circle cx="22" cy="22" r="18" fill="none" stroke="rgba(255,255,255,0.5)" strokeWidth="2"
-            strokeDasharray={2 * Math.PI * 18} strokeDashoffset={2 * Math.PI * 18}
-            strokeLinecap="round" ref={ringRef} transform="rotate(-90 22 22)" />
-        </svg>
-      </div>
 
       <nav className="navbar" ref={navbarRef}>
         <div className="container">
