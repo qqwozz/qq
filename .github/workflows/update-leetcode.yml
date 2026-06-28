@@ -1,0 +1,49 @@
+name: Update LeetCode Stats
+
+on:
+  schedule:
+    - cron: '0 12 * * *'
+  workflow_dispatch:
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Fetch LeetCode stats
+        run: |
+          SOLVED=0
+          for API in \
+            "https://leetcode-stats-api.herokuapp.com/oonixxxxx" \
+            "https://alfa-leetcode-api.onrender.com/oonixxxxx/solved" \
+            "https://leetcode-api-faisalshohag.vercel.app/oonixxxxx"; do
+            RESULT=$(curl -sf --max-time 8 "$API" 2>/dev/null)
+            if [ $? -eq 0 ]; then
+              COUNT=$(echo "$RESULT" | python3 -c "import sys,json; d=json.load(sys.stdin); print(d.get('totalSolved') or d.get('solved') or 0)" 2>/dev/null)
+              if [ "$COUNT" -gt 0 ] 2>/dev/null; then
+                SOLVED=$COUNT
+                break
+              fi
+            fi
+          done
+          echo "SOLVED=$SOLVED" >> $GITHUB_ENV
+
+      - name: Update JSON
+        run: |
+          python3 -c "
+          import json, datetime
+          with open('public/leetcode.json', 'r') as f:
+              data = json.load(f)
+          data['solved'] = int('${{ env.SOLVED }}') or data.get('solved', 0)
+          data['updated'] = datetime.date.today().isoformat()
+          with open('public/leetcode.json', 'w') as f:
+              json.dump(data, f)
+          "
+
+      - name: Commit changes
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add public/leetcode.json
+          git diff --cached --quiet || git commit -m "chore: update leetcode stats [skip ci]" && git push

@@ -348,46 +348,49 @@ function App() {
       })
       .catch(() => {})
 
-    fetch('https://api.github.com/users/qqwozz/repos?per_page=100')
-      .then((r) => r.json())
-      .then((repos) => {
-        if (Array.isArray(repos)) {
-          setStats((s) => ({ ...s, repos: repos.length }))
-        }
-      })
-      .catch(() => {})
-
     fetch('https://api.github.com/users/qqwozz')
       .then((r) => r.json())
       .then((data) => {
         if (data) {
           setStats((s) => ({
             ...s,
+            repos: data.public_repos ?? s.repos,
             followers: data.followers ?? s.followers,
           }))
         }
       })
       .catch(() => {})
 
-    const tryLeetCodeAPIs = [
-      'https://leetcode-stats-api.herokuapp.com/oonixxxxx',
-      'https://alfa-leetcode-api.onrender.com/oonixxxxx/solved',
-      'https://leetcode-api-faisalshohag.vercel.app/oonixxxxx',
-    ]
+    // Primary: static JSON from repo (always available)
+    fetch(`${import.meta.env.BASE_URL}leetcode.json`)
+      .then((r) => r.json())
+      .then((data) => {
+        if (data && data.solved) {
+          setStats((s) => ({ ...s, leetcode: data.solved }))
+        }
+      })
+      .catch(() => {})
 
-    const tryLeetCode = async () => {
-      for (const url of tryLeetCodeAPIs) {
+    // Bonus: try live APIs for real-time update
+    const tryLiveAPIs = async () => {
+      const apis = [
+        'https://leetcode-stats-api.herokuapp.com/oonixxxxx',
+        'https://alfa-leetcode-api.onrender.com/oonixxxxx/solved',
+        'https://leetcode-api-faisalshohag.vercel.app/oonixxxxx',
+      ]
+      for (const url of apis) {
         try {
-          const res = await fetch(url, { signal: AbortSignal.timeout(4000) })
+          const res = await fetch(url, { signal: AbortSignal.timeout(3000) })
           const data = await res.json()
-          if (data && (data.totalSolved || data.solved || data.totalQuestions)) {
-            setStats((s) => ({ ...s, leetcode: data.totalSolved || data.solved || 0 }))
+          const solved = data.totalSolved || data.solved || 0
+          if (solved > 0) {
+            setStats((s) => ({ ...s, leetcode: solved }))
             return
           }
         } catch { continue }
       }
     }
-    tryLeetCode()
+    tryLiveAPIs()
   }, [])
 
   const currentYear = new Date().getFullYear()
