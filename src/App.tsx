@@ -7,7 +7,6 @@ function App() {
   const scrollIndicatorRef = useRef<HTMLDivElement>(null)
   const backToTopRef = useRef<HTMLButtonElement>(null)
   const mobileMenuRef = useRef<HTMLDivElement>(null)
-  const cursorRef = useRef<HTMLDivElement>(null)
   const progressRef = useRef<HTMLDivElement>(null)
   const ringRef = useRef<SVGCircleElement>(null)
   const heroTitleRef = useRef<HTMLHeadingElement>(null)
@@ -99,25 +98,6 @@ function App() {
     requestAnimationFrame(raf)
     return () => lenis.destroy()
   }, [])
-
-  // Cursor trail
-  useEffect(() => {
-    if (!ready || !cursorRef.current) return
-    const el = cursorRef.current
-    let cx = 0, cy = 0, tx = 0, ty = 0, raf = 0
-
-    const animate = () => {
-      cx += (tx - cx) * 0.12
-      cy += (ty - cy) * 0.12
-      el.style.transform = `translate(${cx}px, ${cy}px)`
-      raf = requestAnimationFrame(animate)
-    }
-
-    const onMove = (e: MouseEvent) => { tx = e.clientX; ty = e.clientY }
-    raf = requestAnimationFrame(animate)
-    window.addEventListener('mousemove', onMove, { passive: true })
-    return () => { cancelAnimationFrame(raf); window.removeEventListener('mousemove', onMove) }
-  }, [ready])
 
   // Text scramble on hero title
   useEffect(() => {
@@ -400,7 +380,6 @@ function App() {
         </div>
       )}
 
-      <div className="cursor-dot" ref={cursorRef} />
       <div className="noise-overlay" />
       <div className="progress-bar" ref={progressRef} />
 
