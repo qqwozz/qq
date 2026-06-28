@@ -273,7 +273,7 @@ async def execute_trade(trade: Trade):
         </div>
 
         <div className="hero-content">
-          <h1 className="hero-title" data-scrub-hero>QQWOZZ</h1>
+          <h1 className="hero-title" data-scrub-hero>Дима Киселев</h1>
           <p className="hero-subtitle" data-scrub-hero-sub>back-end developer</p>
         </div>
         <div className="scroll-indicator" ref={scrollIndicatorRef}>
@@ -290,7 +290,7 @@ async def execute_trade(trade: Trade):
             <div className="reveal-el">
               <div className="about-label">обо мне</div>
               <p className="about-text">
-                я <strong>Dima Kiselev</strong> (qqwozz) — backend-разработчик в <strong>VTB</strong>, работаю с <strong>Python</strong>, <strong>Go</strong> и <strong>C++</strong>.
+                я <strong>Дима Киселев</strong> (qqwozz) — backend-разработчик, работаю с <strong>Python</strong>, <strong>Go</strong> и <strong>C++</strong>.
                 <br /><br />
                 создаю микросервисы, API и high-load системы. мой подход — <strong>чистая архитектура</strong>, производительность и надёжность.
                 <br /><br />
