@@ -18,6 +18,8 @@ function App() {
   const handleScroll = useCallback(() => {
     const scrollTop = window.scrollY
 
+    document.documentElement.style.setProperty('--scroll', String(scrollTop))
+
     if (navbarRef.current) {
       navbarRef.current.classList.toggle('scrolled', scrollTop > 50)
     }
