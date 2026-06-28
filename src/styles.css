@@ -370,6 +370,79 @@ body::before {
     transform: translateY(0);
 }
 
+/* ========== CURSOR TRAIL ========== */
+.cursor-dot {
+    position: fixed;
+    top: -4px;
+    left: -4px;
+    width: 8px;
+    height: 8px;
+    background: rgba(255, 255, 255, 0.5);
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 9998;
+    mix-blend-mode: difference;
+    transition: width 0.2s, height 0.2s, top 0.2s, left 0.2s;
+}
+
+@media (hover: none) {
+    .cursor-dot { display: none; }
+}
+
+/* ========== NOISE OVERLAY ========== */
+.noise-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 9997;
+    pointer-events: none;
+    opacity: 0.035;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+    background-repeat: repeat;
+    background-size: 128px 128px;
+}
+
+/* ========== MARQUEE ========== */
+.marquee-wrapper {
+    padding: var(--space-xl) 0;
+    overflow: hidden;
+    position: relative;
+    z-index: 1;
+    border-top: 1px solid var(--glass-border);
+    border-bottom: 1px solid var(--glass-border);
+}
+
+.marquee {
+    width: 100%;
+    overflow: hidden;
+}
+
+.marquee-track {
+    display: flex;
+    gap: var(--space-3xl);
+    animation: marqueeScroll 25s linear infinite;
+    width: max-content;
+}
+
+.marquee-item {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--text-muted);
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    white-space: nowrap;
+    transition: color var(--duration-normal) var(--ease-out);
+}
+
+.marquee-item:hover {
+    color: var(--text-primary);
+}
+
+@keyframes marqueeScroll {
+    0% { transform: translateX(0); }
+    100% { transform: translateX(-50%); }
+}
+
 /* Stagger children in grids */
 .skills-row .skill-cell:nth-child(1) { transition-delay: 0ms; }
 .skills-row .skill-cell:nth-child(2) { transition-delay: 60ms; }
@@ -1273,6 +1346,8 @@ body::before {
     .hero-glow { animation: none; }
     .scroll-line { animation: none; opacity: 0.5; }
     .macbook-scene { transform: translate(-50%, -30%) scale(1) !important; opacity: 1 !important; }
+    .cursor-dot { display: none; }
+    .marquee-track { animation: none; }
 }
 
 /* ============================================

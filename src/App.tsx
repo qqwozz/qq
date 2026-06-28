@@ -1,4 +1,5 @@
 import { useEffect, useRef, useCallback, useState } from 'react'
+import Lenis from 'lenis'
 import MacBookScene from './components/MacBookScene'
 
 function App() {
@@ -6,6 +7,7 @@ function App() {
   const scrollIndicatorRef = useRef<HTMLDivElement>(null)
   const backToTopRef = useRef<HTMLButtonElement>(null)
   const mobileMenuRef = useRef<HTMLDivElement>(null)
+  const cursorRef = useRef<HTMLDivElement>(null)
   const [loading, setLoading] = useState(true)
   const [loadingFade, setLoadingFade] = useState(false)
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
@@ -75,6 +77,34 @@ function App() {
     return () => { clearTimeout(t1); clearTimeout(t2) }
   }, [])
 
+  // Lenis smooth scroll
+  useEffect(() => {
+    const lenis = new Lenis({ duration: 1.0, easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)), smoothWheel: true })
+    const raf = (time: number) => { lenis.raf(time); requestAnimationFrame(raf) }
+    requestAnimationFrame(raf)
+    return () => lenis.destroy()
+  }, [])
+
+  // Cursor trail
+  useEffect(() => {
+    if (!ready || !cursorRef.current) return
+    const el = cursorRef.current
+    let cx = 0, cy = 0, tx = 0, ty = 0, raf = 0
+
+    const animate = () => {
+      cx += (tx - cx) * 0.12
+      cy += (ty - cy) * 0.12
+      el.style.transform = `translate(${cx}px, ${cy}px)`
+      raf = requestAnimationFrame(animate)
+    }
+
+    const onMove = (e: MouseEvent) => { tx = e.clientX; ty = e.clientY }
+    raf = requestAnimationFrame(animate)
+    window.addEventListener('mousemove', onMove, { passive: true })
+    return () => { cancelAnimationFrame(raf); window.removeEventListener('mousemove', onMove) }
+  }, [ready])
+
+  // IntersectionObserver for reveals
   useEffect(() => {
     if (!ready) return
     const observer = new IntersectionObserver(
@@ -92,15 +122,95 @@ function App() {
     return () => observer.disconnect()
   }, [ready])
 
+  // Counter spring animation
+  useEffect(() => {
+    if (!ready || (stats.repos === 0 && stats.stars === 0 && stats.followers === 0)) return
+    document.querySelectorAll<HTMLElement>('[data-target]').forEach((el) => {
+      if (el.dataset.animated) return
+      const target = parseInt(el.dataset.target || '0')
+      if (isNaN(target) || target === 0) return
+      el.dataset.animated = '1'
+
+      let current = 0
+      let velocity = 0
+      const stiffness = 0.08
+      const damping = 0.7
+
+      const tick = () => {
+        const force = (target - current) * stiffness
+        velocity = (velocity + force) * damping
+        current += velocity
+        el.textContent = String(Math.round(current))
+        if (Math.abs(target - current) > 0.5 || Math.abs(velocity) > 0.1) {
+          requestAnimationFrame(tick)
+        } else {
+          el.textContent = String(target)
+        }
+      }
+      requestAnimationFrame(tick)
+    })
+  }, [ready, stats])
+
+  // Magnetic cards — 3D tilt toward cursor
+  useEffect(() => {
+    if (!ready) return
+    const cards = document.querySelectorAll<HTMLElement>('.stat-cell, .feature-cell, .skill-cell, .experience-card')
+    const cleanup: (() => void)[] = []
+
+    cards.forEach((card) => {
+      const onMove = (e: MouseEvent) => {
+        const rect = card.getBoundingClientRect()
+        const x = (e.clientX - rect.left) / rect.width - 0.5
+        const y = (e.clientY - rect.top) / rect.height - 0.5
+        card.style.transform = `perspective(600px) rotateY(${x * 8}deg) rotateX(${-y * 8}deg) translateY(-2px)`
+      }
+      const onLeave = () => { card.style.transform = '' }
+      card.addEventListener('mousemove', onMove)
+      card.addEventListener('mouseleave', onLeave)
+      cleanup.push(() => { card.removeEventListener('mousemove', onMove); card.removeEventListener('mouseleave', onLeave) })
+    })
+
+    return () => cleanup.forEach((fn) => fn())
+  }, [ready])
+
+  // Magnetic contact links — attract toward cursor
+  useEffect(() => {
+    if (!ready) return
+    const links = document.querySelectorAll<HTMLElement>('.contact-link')
+    const cleanup: (() => void)[] = []
+
+    links.forEach((link) => {
+      const onMove = (e: MouseEvent) => {
+        const rect = link.getBoundingClientRect()
+        const cx = rect.left + rect.width / 2
+        const cy = rect.top + rect.height / 2
+        const dx = e.clientX - cx
+        const dy = e.clientY - cy
+        const dist = Math.sqrt(dx * dx + dy * dy)
+        const maxDist = 200
+
+        if (dist < maxDist) {
+          const force = (1 - dist / maxDist) * 12
+          link.style.transform = `translate(${dx * force / maxDist}px, ${dy * force / maxDist}px)`
+        }
+      }
+      const onLeave = () => { link.style.transform = '' }
+      link.addEventListener('mousemove', onMove)
+      link.addEventListener('mouseleave', onLeave)
+      cleanup.push(() => { link.removeEventListener('mousemove', onMove); link.removeEventListener('mouseleave', onLeave) })
+    })
+
+    return () => cleanup.forEach((fn) => fn())
+  }, [ready])
+
+  // Laptop parallax
   useEffect(() => {
     if (!ready) return
     const el = document.querySelector<HTMLElement>('.macbook-scene')
     if (!el) return
-    const shadow = el.querySelector<HTMLElement>(':scope')
 
     let current = { ty: -30, scale: 1, opacity: 1, rotX: 0, rotY: 0, blur: 0 }
     let target = { ty: -30, scale: 1, opacity: 1, rotX: 0, rotY: 0, blur: 0 }
-    let mouse = { x: 0, y: 0 }
     let scrollVel = 0
     let lastScroll = 0
     let lastTime = performance.now()
@@ -149,10 +259,7 @@ function App() {
 
     const onMouseMove = (e: MouseEvent) => {
       const cx = window.innerWidth / 2
-      const cy = window.innerHeight / 2
-      mouse.x = (e.clientX - cx) / cx
-      mouse.y = (e.clientY - cy) / cy
-      target.rotY = mouse.x * 5
+      target.rotY = ((e.clientX - cx) / cx) * 5
     }
 
     raf = requestAnimationFrame(animate)
@@ -166,6 +273,7 @@ function App() {
     }
   }, [ready])
 
+  // GitHub stats
   useEffect(() => {
     fetch('https://api.github.com/users/qqwozz')
       .then((r) => r.json())
@@ -196,6 +304,8 @@ function App() {
   const currentYear = new Date().getFullYear()
   const closeMobileMenu = () => setMobileMenuOpen(false)
 
+  const techs = ['Python', 'Go', 'C++', 'FastAPI', 'Django', 'gRPC', 'PostgreSQL', 'Redis', 'Docker', 'Linux', 'Git', 'Nginx']
+
   return (
     <>
       {loading && (
@@ -203,6 +313,9 @@ function App() {
           <div className="loading-spinner" />
         </div>
       )}
+
+      <div className="cursor-dot" ref={cursorRef} />
+      <div className="noise-overlay" />
 
       <nav className="navbar" ref={navbarRef}>
         <div className="container">
@@ -267,19 +380,19 @@ function App() {
             </div>
             <div className="about-stats anim">
               <div className="stat-cell">
-                <div className="stat-number">{stats.repos}</div>
+                <div className="stat-number" data-target={stats.repos}>0</div>
                 <div className="stat-label">репозиториев</div>
               </div>
               <div className="stat-cell">
-                <div className="stat-number">{stats.stars}</div>
+                <div className="stat-number" data-target={stats.stars}>0</div>
                 <div className="stat-label">звёзд</div>
               </div>
               <div className="stat-cell">
-                <div className="stat-number">{stats.followers}</div>
+                <div className="stat-number" data-target={stats.followers}>0</div>
                 <div className="stat-label">фолловеров</div>
               </div>
               <div className="stat-cell">
-                <div className="stat-number">{stats.languages}</div>
+                <div className="stat-number" data-target={stats.languages}>0</div>
                 <div className="stat-label">языков</div>
               </div>
             </div>
@@ -287,7 +400,15 @@ function App() {
         </div>
       </section>
 
-      <div className="divider" />
+      <div className="marquee-wrapper anim">
+        <div className="marquee">
+          <div className="marquee-track">
+            {techs.concat(techs).map((t, i) => (
+              <span key={i} className="marquee-item">{t}</span>
+            ))}
+          </div>
+        </div>
+      </div>
 
       <section className="section" id="experience">
         <div className="container">
@@ -476,7 +597,7 @@ function App() {
       <button
         className="back-to-top"
         ref={backToTopRef}
-        onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+        onClick={() => window.scrollTo({ top: 0 })}
         aria-label="Наверх"
       >
         <svg viewBox="0 0 24 24" aria-hidden="true"><polyline points="18 15 12 9 6 15" /></svg>
