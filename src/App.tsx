@@ -130,8 +130,6 @@ function App() {
         </div>
       )}
 
-      <MacBookScene />
-
       <nav className="navbar" ref={navbarRef}>
         <div className="container">
           <div className="nav-inner">
@@ -166,29 +164,8 @@ function App() {
       </nav>
 
       <section className="hero" id="hero">
+        <MacBookScene />
         <div className="hero-glow" />
-        <div className="hero-code-bg">{`from fastapi import FastAPI
-from pydantic import BaseModel
-
-app = FastAPI()
-
-class Trade(BaseModel):
-    symbol: str
-    amount: float
-    side: str
-
-@app.post("/trade")
-async def execute_trade(trade: Trade):
-    result = await matching_engine.process(trade)
-    return {"status": "executed", "id": result.id}
-
-# qwwozzz @ VTB dev`}</div>
-        <div className="hero-image-wrap">
-          <div className="hero-orb hero-orb-1" />
-          <div className="hero-orb hero-orb-2" />
-          <div className="hero-orb hero-orb-3" />
-        </div>
-
         <div className="hero-content">
           <h1 className="hero-title">Дима Киселев</h1>
           <p className="hero-subtitle">back-end developer</p>
