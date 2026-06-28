@@ -96,20 +96,30 @@ function App() {
     if (!ready) return
     const el = document.querySelector<HTMLElement>('.macbook-scene')
     if (!el) return
+    const shadow = el.querySelector<HTMLElement>(':scope')
 
-    let current = { ty: -30, scale: 1, opacity: 1 }
-    let target = { ty: -30, scale: 1, opacity: 1 }
+    let current = { ty: -30, scale: 1, opacity: 1, rotX: 0, rotY: 0, blur: 0 }
+    let target = { ty: -30, scale: 1, opacity: 1, rotX: 0, rotY: 0, blur: 0 }
+    let mouse = { x: 0, y: 0 }
+    let scrollVel = 0
+    let lastScroll = 0
+    let lastTime = performance.now()
     let raf = 0
 
     const lerp = (a: number, b: number, t: number) => a + (b - a) * t
 
     const animate = () => {
-      current.ty = lerp(current.ty, target.ty, 0.08)
-      current.scale = lerp(current.scale, target.scale, 0.08)
-      current.opacity = lerp(current.opacity, target.opacity, 0.08)
+      const t = 0.06
+      current.ty = lerp(current.ty, target.ty, t)
+      current.scale = lerp(current.scale, target.scale, t)
+      current.opacity = lerp(current.opacity, target.opacity, t)
+      current.rotX = lerp(current.rotX, target.rotX, t)
+      current.rotY = lerp(current.rotY, target.rotY, t)
+      current.blur = lerp(current.blur, target.blur, t)
 
-      el.style.transform = `translate(-50%, ${current.ty}%) scale(${current.scale})`
+      el.style.transform = `translate(-50%, ${current.ty}%) scale(${current.scale}) perspective(800px) rotateX(${current.rotX}deg) rotateY(${current.rotY}deg)`
       el.style.opacity = String(current.opacity)
+      el.style.filter = current.blur > 0.1 ? `blur(${current.blur}px)` : ''
 
       raf = requestAnimationFrame(animate)
     }
@@ -117,20 +127,42 @@ function App() {
     const onScroll = () => {
       const scrollY = window.scrollY
       const vh = window.innerHeight
+      const now = performance.now()
+      const dt = Math.max(now - lastTime, 1)
+      lastTime = now
+
+      const rawVel = Math.abs(scrollY - lastScroll) / dt
+      scrollVel = lerp(scrollVel, Math.min(rawVel * 10, 1), 0.12)
+      lastScroll = scrollY
+
       const p = Math.min(scrollY / (vh * 0.85), 1)
       const ease = p < 0.5 ? 2 * p * p : 1 - Math.pow(-2 * p + 2, 2) / 2
 
-      target.ty = -30 + ease * 90
-      target.scale = 1 - ease * 0.3
+      const velBoost = 1 + scrollVel * 0.4
+
+      target.ty = -30 + ease * 90 * velBoost
+      target.scale = 1 - ease * 0.3 * velBoost
       target.opacity = 1 - ease * 0.55
+      target.blur = ease * 2.5
+      target.rotX = ease * 8 + scrollVel * 4
+    }
+
+    const onMouseMove = (e: MouseEvent) => {
+      const cx = window.innerWidth / 2
+      const cy = window.innerHeight / 2
+      mouse.x = (e.clientX - cx) / cx
+      mouse.y = (e.clientY - cy) / cy
+      target.rotY = mouse.x * 5
     }
 
     raf = requestAnimationFrame(animate)
     window.addEventListener('scroll', onScroll, { passive: true })
+    window.addEventListener('mousemove', onMouseMove, { passive: true })
 
     return () => {
       cancelAnimationFrame(raf)
       window.removeEventListener('scroll', onScroll)
+      window.removeEventListener('mousemove', onMouseMove)
     }
   }, [ready])
 

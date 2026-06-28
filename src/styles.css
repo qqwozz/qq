@@ -1021,8 +1021,23 @@ body::before {
     height: 100%;
     z-index: 0;
     pointer-events: none;
-    will-change: transform, opacity;
+    will-change: transform, opacity, filter;
     transform: translate(-50%, -30%) scale(1);
+}
+
+.macbook-scene::after {
+    content: '';
+    position: absolute;
+    bottom: 15%;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 200px;
+    height: 30px;
+    background: radial-gradient(ellipse, rgba(0,0,0,0.35) 0%, transparent 70%);
+    border-radius: 50%;
+    opacity: 0;
+    transition: opacity 0.4s var(--ease-out), width 0.4s var(--ease-out), height 0.4s var(--ease-out);
+    pointer-events: none;
 }
 
 .macbook-scene canvas {
