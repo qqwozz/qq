@@ -1,43 +1,5 @@
 import { useEffect, useRef, useCallback, useState } from 'react'
 import MacBookScene from './components/MacBookScene'
-import { gsap } from 'gsap'
-import { ScrollTrigger } from 'gsap/ScrollTrigger'
-
-gsap.registerPlugin(ScrollTrigger)
-
-function splitToSpans(text: string) {
-  const words = text.split(' ')
-  const container = document.createDocumentFragment()
-  words.forEach((word) => {
-    const wordSpan = document.createElement('span')
-    word.split('').forEach((ch) => {
-      const letterSpan = document.createElement('span')
-      letterSpan.textContent = ch
-      letterSpan.style.opacity = '0'
-      wordSpan.appendChild(letterSpan)
-    })
-    const space = document.createTextNode(' ')
-    wordSpan.appendChild(space)
-    container.appendChild(wordSpan)
-  })
-  return container
-}
-
-function initScrubAnimation(
-  selector: string,
-  from: gsap.TweenVars,
-  to: gsap.TweenVars,
-  triggerOpts?: Partial<ScrollTrigger.Vars>
-) {
-  document.querySelectorAll<HTMLElement>(selector).forEach((el) => {
-    el.textContent = ''
-    el.appendChild(splitToSpans(el.textContent || ''))
-    gsap.fromTo(el.querySelectorAll('span span'), from, {
-      ...to,
-      scrollTrigger: { trigger: el, start: 'top 70%', end: 'top 60%', scrub: 1.5, ...triggerOpts },
-    })
-  })
-}
 
 function App() {
   const navbarRef = useRef<HTMLElement>(null)
@@ -48,6 +10,7 @@ function App() {
   const [loadingFade, setLoadingFade] = useState(false)
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const [stats, setStats] = useState({ repos: 0, stars: 0, followers: 0, languages: 6 })
+  const [heroVisible, setHeroVisible] = useState(false)
 
   const sectionsRef = useRef<HTMLElement[]>([])
   const navLinksRef = useRef<HTMLElement[]>([])
@@ -90,17 +53,14 @@ function App() {
 
   useEffect(() => {
     if (!mobileMenuOpen) return
-
     const handleKey = (e: KeyboardEvent) => {
       if (e.key === 'Escape') setMobileMenuOpen(false)
     }
-
     const handleClick = (e: MouseEvent) => {
       if (mobileMenuRef.current && !mobileMenuRef.current.contains(e.target as Node)) {
         setMobileMenuOpen(false)
       }
     }
-
     document.addEventListener('keydown', handleKey)
     document.addEventListener('mousedown', handleClick)
     return () => {
@@ -110,8 +70,8 @@ function App() {
   }, [mobileMenuOpen])
 
   useEffect(() => {
-    const t1 = setTimeout(() => setLoadingFade(true), 800)
-    const t2 = setTimeout(() => setLoading(false), 1400)
+    const t1 = setTimeout(() => setLoadingFade(true), 600)
+    const t2 = setTimeout(() => { setLoading(false); setHeroVisible(true) }, 1100)
     return () => { clearTimeout(t1); clearTimeout(t2) }
   }, [])
 
@@ -143,84 +103,26 @@ function App() {
   }, [])
 
   useEffect(() => {
-    const scrubFrom = { opacity: 0.1, y: 20 }
-    const scrubTo = { opacity: 1, y: 0, ease: 'Power0.easeNone', duration: 1, stagger: 0.4 }
+    if (loading) return
 
-    initScrubAnimation('[scrub-text]', scrubFrom, scrubTo)
-    initScrubAnimation('[scrub-each-word]', scrubFrom, scrubTo)
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('in-view')
+            observer.unobserve(entry.target)
+          }
+        })
+      },
+      { threshold: 0.1, rootMargin: '0px 0px -60px 0px' }
+    )
 
-    const tweens: gsap.core.Tween[] = []
+    document.querySelectorAll<HTMLElement>('.reveal').forEach((el) => observer.observe(el))
 
-    const heroTitle = document.querySelector<HTMLElement>('[data-scrub-hero]')
-    if (heroTitle) {
-      const text = heroTitle.textContent!
-      heroTitle.textContent = ''
-      text.split('').forEach((ch) => {
-        const s = document.createElement('span')
-        s.textContent = ch === ' ' ? '\u00A0' : ch
-        s.style.display = 'inline-block'
-        heroTitle.appendChild(s)
-      })
-      tweens.push(gsap.fromTo(
-        heroTitle.querySelectorAll('span'),
-        { opacity: 0, y: 50 },
-        { opacity: 1, y: 0, duration: 1.2, stagger: 0.07, ease: 'back.out(1.4)', delay: 0.3 }
-      ))
-    }
-
-    const heroSub = document.querySelector<HTMLElement>('[data-scrub-hero-sub]')
-    if (heroSub) {
-      tweens.push(gsap.fromTo(heroSub, { opacity: 0, y: 20 }, {
-        opacity: 1, y: 0, duration: 1, delay: 1.2, ease: 'power3.out',
-      }))
-    }
-
-    document.querySelectorAll<HTMLElement>('.reveal-el').forEach((el) => {
-      gsap.fromTo(el, { opacity: 0, y: 60 }, {
-        opacity: 1, y: 0, duration: 1.2, ease: 'power3.out',
-        scrollTrigger: { trigger: el, start: 'top 88%' },
-      })
-    })
-
-    const showcaseCode = document.querySelector<HTMLElement>('.showcase-code')
-    if (showcaseCode) {
-      gsap.fromTo(showcaseCode, { opacity: 0, scale: 0.95 }, {
-        opacity: 1, scale: 1, duration: 1.5, ease: 'power3.out',
-        scrollTrigger: { trigger: showcaseCode, start: 'top 80%' },
-      })
-    }
-
-    document.querySelectorAll<HTMLElement>('.hero-orb').forEach((orb) => {
-      gsap.to(orb, {
-        y: -80, ease: 'none',
-        scrollTrigger: { trigger: '.hero', start: 'top top', end: 'bottom top', scrub: true },
-      })
-    })
-
-    return () => {
-      tweens.forEach((t) => t.kill())
-      ScrollTrigger.getAll().forEach((t) => t.kill())
-    }
-  }, [])
-
-  useEffect(() => {
-    if (stats.repos === 0 && stats.stars === 0 && stats.followers === 0) return
-
-    document.querySelectorAll<HTMLElement>('[data-count]').forEach((counter) => {
-      if (counter.dataset.animated) return
-      const target = parseInt(counter.getAttribute('data-count')!)
-      if (isNaN(target) || target === 0) return
-      counter.dataset.animated = '1'
-      gsap.fromTo(counter, { textContent: '0' }, {
-        textContent: target.toString(), duration: 2, ease: 'power2.out',
-        snap: { textContent: 1 },
-        scrollTrigger: { trigger: counter, start: 'top 85%' },
-      })
-    })
-  }, [stats])
+    return () => observer.disconnect()
+  }, [loading])
 
   const currentYear = new Date().getFullYear()
-
   const closeMobileMenu = () => setMobileMenuOpen(false)
 
   return (
@@ -244,7 +146,7 @@ function App() {
               <a href="#stack" className="nav-link">стек</a>
               <a href="#contact" className="nav-link">связаться</a>
             </div>
-            <a href="#contact" className="nav-contact">поддержка</a>
+            <a href="#contact" className="nav-contact">связаться</a>
             <button
               className={`nav-burger${mobileMenuOpen ? ' active' : ''}`}
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
@@ -291,8 +193,8 @@ async def execute_trade(trade: Trade):
         </div>
 
         <div className="hero-content">
-          <h1 className="hero-title" data-scrub-hero>Дима Киселев</h1>
-          <p className="hero-subtitle" data-scrub-hero-sub>back-end developer</p>
+          <h1 className={`hero-title${heroVisible ? ' visible' : ''}`}>Дима Киселев</h1>
+          <p className={`hero-subtitle${heroVisible ? ' visible' : ''}`}>back-end developer</p>
         </div>
         <div className="scroll-indicator" ref={scrollIndicatorRef}>
           <div className="scroll-line" />
@@ -305,7 +207,7 @@ async def execute_trade(trade: Trade):
         <div className="container">
           <div className="section-number">001</div>
           <div className="about-grid">
-            <div className="reveal-el">
+            <div className="reveal">
               <div className="about-label">обо мне</div>
               <p className="about-text">
                 я <strong>Дима Киселев</strong> (qqwozz) — backend-разработчик, работаю с <strong>Python</strong>, <strong>Go</strong> и <strong>C++</strong>.
@@ -315,21 +217,21 @@ async def execute_trade(trade: Trade):
                 MTUCI — Moscow Technical University of Communications and Informatics. Москва.
               </p>
             </div>
-            <div className="about-stats reveal-el">
+            <div className="about-stats reveal">
               <div className="stat-cell">
-                <div className="stat-number" data-count={stats.repos}>0</div>
+                <div className="stat-number">{stats.repos}</div>
                 <div className="stat-label">репозиториев</div>
               </div>
               <div className="stat-cell">
-                <div className="stat-number" data-count={stats.stars}>0</div>
+                <div className="stat-number">{stats.stars}</div>
                 <div className="stat-label">звёзд</div>
               </div>
               <div className="stat-cell">
-                <div className="stat-number" data-count={stats.followers}>0</div>
+                <div className="stat-number">{stats.followers}</div>
                 <div className="stat-label">фолловеров</div>
               </div>
               <div className="stat-cell">
-                <div className="stat-number" data-count={stats.languages}>0</div>
+                <div className="stat-number">{stats.languages}</div>
                 <div className="stat-label">языков</div>
               </div>
             </div>
@@ -342,8 +244,8 @@ async def execute_trade(trade: Trade):
       <section className="section" id="experience">
         <div className="container">
           <div className="section-number">002</div>
-          <p className="scrub-each-word" scrub-each-word="">опыт работы</p>
-          <div className="experience-list reveal-el">
+          <h2 className="section-title reveal">опыт работы</h2>
+          <div className="experience-list reveal">
             <div className="experience-card">
               <div className="experience-header">
                 <div className="experience-role">backend-разработчик (стажёр)</div>
@@ -390,8 +292,8 @@ async def execute_trade(trade: Trade):
       <section className="section" id="projects">
         <div className="container">
           <div className="section-number">003</div>
-          <p className="scrub-each-word" scrub-each-word="">избранные проекты</p>
-          <div className="projects-list reveal-el">
+          <h2 className="section-title reveal">избранные проекты</h2>
+          <div className="projects-list reveal">
             <a className="project-row" href="https://github.com/qqwozz/QW_Trading_Platform" target="_blank" rel="noreferrer">
               <span className="project-idx">01</span>
               <span className="project-name">qw trading platform</span>
@@ -431,8 +333,8 @@ async def execute_trade(trade: Trade):
       <section className="section" id="stack">
         <div className="container">
           <div className="section-number">004</div>
-          <p className="scrub-each-word" scrub-each-word="">стек технологий</p>
-          <div className="features-grid reveal-el">
+          <h2 className="section-title reveal">стек технологий</h2>
+          <div className="features-grid reveal">
             <div className="feature-cell">
               <div className="feature-num">01</div>
               <div className="feature-name">бэкенд</div>
@@ -455,7 +357,7 @@ async def execute_trade(trade: Trade):
             </div>
           </div>
 
-          <div className="skills-row reveal-el">
+          <div className="skills-row reveal">
             {[
               { icon: 'PY', name: 'python', level: 'эксперт' },
               { icon: 'GO', name: 'go', level: 'продвинутый' },
@@ -469,7 +371,7 @@ async def execute_trade(trade: Trade):
               </div>
             ))}
           </div>
-          <div className="skills-row-2 reveal-el">
+          <div className="skills-row-2 reveal">
             {[
               { icon: 'DK', name: 'docker', level: 'продвинутый' },
               { icon: 'GT', name: 'git', level: 'эксперт' },
@@ -490,8 +392,8 @@ async def execute_trade(trade: Trade):
 
       <section className="section" id="contact">
         <div className="contact-block">
-          <p className="scrub-text" scrub-text="">связаться<br />со мной</p>
-          <div className="contact-links-wrapper reveal-el">
+          <h2 className="section-title-lg reveal">связаться<br />со мной</h2>
+          <div className="contact-links-wrapper reveal">
             <div className="contact-links">
               <a href="https://t.me/qwwozzz" target="_blank" rel="noreferrer" className="contact-link">
                 <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M11.944 0A12 12 0 000 12a12 12 0 0012 12 12 12 0 0012-12A12 12 0 0012 0h-.056zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 01.171.325c.016.093.036.306.02.472-.18 1.898-.962 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.479.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z" /></svg>
@@ -526,7 +428,7 @@ async def execute_trade(trade: Trade):
       <button
         className="back-to-top"
         ref={backToTopRef}
-        onClick={() => window.scrollTo({ top: 0 })}
+        onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
         aria-label="Наверх"
       >
         <svg viewBox="0 0 24 24" aria-hidden="true"><polyline points="18 15 12 9 6 15" /></svg>
