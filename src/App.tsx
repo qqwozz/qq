@@ -97,19 +97,24 @@ function App() {
     const el = document.querySelector<HTMLElement>('.macbook-scene')
     if (!el) return
 
+    let ticking = false
     const onScroll = () => {
-      const scrollY = window.scrollY
-      const vh = window.innerHeight
-      const progress = Math.min(scrollY / (vh * 0.8), 1)
+      if (ticking) return
+      ticking = true
+      requestAnimationFrame(() => {
+        const scrollY = window.scrollY
+        const vh = window.innerHeight
+        const progress = Math.min(scrollY / (vh * 0.9), 1)
+        const ease = 1 - Math.pow(1 - progress, 3)
 
-      const ty = -30 - progress * 130
-      const scale = 1 - progress * 0.4
-      const rotX = progress * 25
-      const rotY = progress * -30
-      const opacity = 1 - progress * 0.6
+        const ty = -30 + ease * 80
+        const scale = 1 - ease * 0.25
+        const opacity = 1 - ease * 0.5
 
-      el.style.transform = `translate(-50%, ${ty}%) scale(${scale}) rotateX(${rotX}deg) rotateY(${rotY}deg)`
-      el.style.opacity = String(opacity)
+        el.style.transform = `translate(-50%, ${ty}%) scale(${scale})`
+        el.style.opacity = String(opacity)
+        ticking = false
+      })
     }
 
     window.addEventListener('scroll', onScroll, { passive: true })
