@@ -14,7 +14,7 @@ function App() {
   const [loading, setLoading] = useState(true)
   const [loadingFade, setLoadingFade] = useState(false)
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
-  const [stats, setStats] = useState({ repos: 0, stars: 0, followers: 0, languages: 6 })
+  const [stats, setStats] = useState({ repos: 0, leetcode: 0, followers: 0, languages: 6 })
   const [ready, setReady] = useState(false)
 
   const sectionsRef = useRef<HTMLElement[]>([])
@@ -169,7 +169,7 @@ function App() {
 
   // Counter spring animation
   useEffect(() => {
-    if (!ready || (stats.repos === 0 && stats.stars === 0 && stats.followers === 0)) return
+    if (!ready || (stats.repos === 0 && stats.leetcode === 0 && stats.followers === 0)) return
     document.querySelectorAll<HTMLElement>('[data-target]').forEach((el) => {
       if (el.dataset.animated) return
       const target = parseInt(el.dataset.target || '0')
@@ -358,10 +358,16 @@ function App() {
       .then((r) => r.json())
       .then((repos) => {
         if (Array.isArray(repos)) {
-          const totalStars = repos.reduce(
-            (sum: number, r: { stargazers_count?: number }) => sum + (r.stargazers_count ?? 0), 0
-          )
-          setStats((s) => ({ ...s, stars: totalStars }))
+          setStats((s) => ({ ...s, repos: repos.length }))
+        }
+      })
+      .catch(() => {})
+
+    fetch('https://leetcode-stats-api.herokuapp.com/oonixxxxx')
+      .then((r) => r.json())
+      .then((data) => {
+        if (data && data.totalSolved) {
+          setStats((s) => ({ ...s, leetcode: data.totalSolved }))
         }
       })
       .catch(() => {})
@@ -459,8 +465,8 @@ function App() {
                 <div className="stat-label">репозиториев</div>
               </div>
               <div className="stat-cell">
-                <div className="stat-number" data-target={stats.stars}>{stats.stars || <span className="skeleton" />}</div>
-                <div className="stat-label">звёзд</div>
+                <div className="stat-number" data-target={stats.leetcode}>{stats.leetcode || <span className="skeleton" />}</div>
+                <div className="stat-label">leetcode решено</div>
               </div>
               <div className="stat-cell">
                 <div className="stat-number" data-target={stats.followers}>{stats.followers || <span className="skeleton" />}</div>
@@ -651,6 +657,10 @@ function App() {
                 <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z" /></svg>
                 instagram
               </a>
+              <a href="https://leetcode.com/u/oonixxxxx/" target="_blank" rel="noreferrer" className="contact-link">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M13.483 0a1.374 1.374 0 0 0-.961.438L7.116 6.226l-3.854 4.126a5.266 5.266 0 0 0-1.209 2.104 5.35 5.35 0 0 0-.125.513 5.527 5.527 0 0 0 .062 2.362 5.83 5.83 0 0 0 .349 1.017 5.938 5.938 0 0 0 1.271 1.818l4.277 4.193.039.038c2.248 2.165 5.852 2.133 8.063-.074l2.396-2.392c.54-.54.54-1.414.003-1.955a1.378 1.378 0 0 0-1.951-.003l-2.396 2.392a3.021 3.021 0 0 1-4.205.038l-.02-.019-4.276-4.193c-.652-.64-.972-1.469-.948-2.263a2.68 2.68 0 0 1 .066-.523 2.544 2.544 0 0 1 .619-1.164L9.13 8.114c1.058-1.134 3.204-1.27 4.53-.278l3.501 2.831c.593.48 1.461.387 1.94-.207a1.384 1.384 0 0 0-.207-1.943l-3.5-2.831c-.8-.647-1.766-1.045-2.774-1.202l2.015-2.158A1.384 1.384 0 0 0 13.483 0zm-2.866 12.815a1.38 1.38 0 0 0-1.38 1.382 1.38 1.38 0 0 0 1.38 1.382H20.79a1.38 1.38 0 0 0 1.38-1.382 1.38 1.38 0 0 0-1.38-1.382z" /></svg>
+                leetcode
+              </a>
               <a href="mailto:offconix@gmail.com" className="contact-link">
                 <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z" /></svg>
                 email
@@ -668,6 +678,7 @@ function App() {
               <a href="https://github.com/qqwozz" target="_blank" rel="noreferrer">github</a>
               <a href="https://t.me/qqqwozz" target="_blank" rel="noreferrer">telegram</a>
               <a href="https://instagram.com/qqqwozz" target="_blank" rel="noreferrer">instagram</a>
+              <a href="https://leetcode.com/u/oonixxxxx/" target="_blank" rel="noreferrer">leetcode</a>
               <a href="#contact">связаться</a>
             </div>
           </div>
