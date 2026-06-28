@@ -219,7 +219,7 @@ function App() {
     const lerp = (a: number, b: number, t: number) => a + (b - a) * t
 
     const animate = () => {
-      const t = 0.06
+      const t = 0.035
       current.ty = lerp(current.ty, target.ty, t)
       current.scale = lerp(current.scale, target.scale, t)
       current.opacity = lerp(current.opacity, target.opacity, t)
@@ -248,7 +248,7 @@ function App() {
       const p = Math.min(scrollY / (vh * 0.85), 1)
       const ease = p < 0.5 ? 2 * p * p : 1 - Math.pow(-2 * p + 2, 2) / 2
 
-      const velBoost = 1 + scrollVel * 0.4
+      const velBoost = 1 + scrollVel * 0.2
 
       target.ty = -30 + ease * 90 * velBoost
       target.scale = 1 - ease * 0.3 * velBoost
@@ -259,7 +259,7 @@ function App() {
 
     const onMouseMove = (e: MouseEvent) => {
       const cx = window.innerWidth / 2
-      target.rotY = ((e.clientX - cx) / cx) * 5
+      target.rotY = ((e.clientX - cx) / cx) * 3
     }
 
     raf = requestAnimationFrame(animate)
