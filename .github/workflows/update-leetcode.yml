@@ -14,20 +14,22 @@ jobs:
       - name: Fetch LeetCode stats
         run: |
           SOLVED=0
-          for API in \
-            "https://leetcode-stats-api.herokuapp.com/oonixxxxx" \
-            "https://alfa-leetcode-api.onrender.com/oonixxxxx/solved" \
-            "https://leetcode-api-faisalshohag.vercel.app/oonixxxxx"; do
-            RESULT=$(curl -sf --max-time 8 "$API" 2>/dev/null)
-            if [ $? -eq 0 ]; then
-              COUNT=$(echo "$RESULT" | python3 -c "import sys,json; d=json.load(sys.stdin); print(d.get('totalSolved') or d.get('solved') or 0)" 2>/dev/null)
-              if [ "$COUNT" -gt 0 ] 2>/dev/null; then
-                SOLVED=$COUNT
-                break
-              fi
-            fi
-          done
+          EASY=0
+          MEDIUM=0
+          HARD=0
+
+          RESULT=$(curl -sf --max-time 10 "https://alfa-leetcode-api.onrender.com/oonixxxxx/solved" 2>/dev/null)
+          if [ $? -eq 0 ]; then
+            SOLVED=$(echo "$RESULT" | python3 -c "import sys,json; d=json.load(sys.stdin); print(d.get('solvedProblem', 0))" 2>/dev/null || echo 0)
+            EASY=$(echo "$RESULT" | python3 -c "import sys,json; d=json.load(sys.stdin); print(d.get('easySolved', 0))" 2>/dev/null || echo 0)
+            MEDIUM=$(echo "$RESULT" | python3 -c "import sys,json; d=json.load(sys.stdin); print(d.get('mediumSolved', 0))" 2>/dev/null || echo 0)
+            HARD=$(echo "$RESULT" | python3 -c "import sys,json; d=json.load(sys.stdin); print(d.get('hardSolved', 0))" 2>/dev/null || echo 0)
+          fi
+
           echo "SOLVED=$SOLVED" >> $GITHUB_ENV
+          echo "EASY=$EASY" >> $GITHUB_ENV
+          echo "MEDIUM=$MEDIUM" >> $GITHUB_ENV
+          echo "HARD=$HARD" >> $GITHUB_ENV
 
       - name: Update JSON
         run: |
@@ -35,7 +37,12 @@ jobs:
           import json, datetime
           with open('public/leetcode.json', 'r') as f:
               data = json.load(f)
-          data['solved'] = int('${{ env.SOLVED }}') or data.get('solved', 0)
+          solved = int('${{ env.SOLVED }}')
+          if solved > 0:
+              data['solved'] = solved
+              data['easy'] = int('${{ env.EASY }}')
+              data['medium'] = int('${{ env.MEDIUM }}')
+              data['hard'] = int('${{ env.HARD }}')
           data['updated'] = datetime.date.today().isoformat()
           with open('public/leetcode.json', 'w') as f:
               json.dump(data, f)
