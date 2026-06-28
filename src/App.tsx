@@ -18,8 +18,6 @@ function App() {
   const handleScroll = useCallback(() => {
     const scrollTop = window.scrollY
 
-    document.documentElement.style.setProperty('--scroll', String(scrollTop))
-
     if (navbarRef.current) {
       navbarRef.current.classList.toggle('scrolled', scrollTop > 50)
     }
@@ -92,6 +90,30 @@ function App() {
     )
     document.querySelectorAll<HTMLElement>('.anim').forEach((el) => observer.observe(el))
     return () => observer.disconnect()
+  }, [ready])
+
+  useEffect(() => {
+    if (!ready) return
+    const el = document.querySelector<HTMLElement>('.macbook-scene')
+    if (!el) return
+
+    const onScroll = () => {
+      const scrollY = window.scrollY
+      const vh = window.innerHeight
+      const progress = Math.min(scrollY / (vh * 0.8), 1)
+
+      const ty = -30 - progress * 130
+      const scale = 1 - progress * 0.4
+      const rotX = progress * 25
+      const rotY = progress * -30
+      const opacity = 1 - progress * 0.6
+
+      el.style.transform = `translate(-50%, ${ty}%) scale(${scale}) rotateX(${rotX}deg) rotateY(${rotY}deg)`
+      el.style.opacity = String(opacity)
+    }
+
+    window.addEventListener('scroll', onScroll, { passive: true })
+    return () => window.removeEventListener('scroll', onScroll)
   }, [ready])
 
   useEffect(() => {
