@@ -10,7 +10,7 @@ function App() {
   const [loadingFade, setLoadingFade] = useState(false)
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const [stats, setStats] = useState({ repos: 0, stars: 0, followers: 0, languages: 6 })
-  const [heroVisible, setHeroVisible] = useState(false)
+  const [ready, setReady] = useState(false)
 
   const sectionsRef = useRef<HTMLElement[]>([])
   const navLinksRef = useRef<HTMLElement[]>([])
@@ -71,9 +71,26 @@ function App() {
 
   useEffect(() => {
     const t1 = setTimeout(() => setLoadingFade(true), 600)
-    const t2 = setTimeout(() => { setLoading(false); setHeroVisible(true) }, 1100)
+    const t2 = setTimeout(() => { setLoading(false); setReady(true) }, 1000)
     return () => { clearTimeout(t1); clearTimeout(t2) }
   }, [])
+
+  useEffect(() => {
+    if (!ready) return
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('show')
+            observer.unobserve(entry.target)
+          }
+        })
+      },
+      { threshold: 0.05, rootMargin: '0px 0px -40px 0px' }
+    )
+    document.querySelectorAll<HTMLElement>('.anim').forEach((el) => observer.observe(el))
+    return () => observer.disconnect()
+  }, [ready])
 
   useEffect(() => {
     fetch('https://api.github.com/users/qqwozz')
@@ -101,26 +118,6 @@ function App() {
       })
       .catch(() => {})
   }, [])
-
-  useEffect(() => {
-    if (loading) return
-
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            entry.target.classList.add('in-view')
-            observer.unobserve(entry.target)
-          }
-        })
-      },
-      { threshold: 0.1, rootMargin: '0px 0px -60px 0px' }
-    )
-
-    document.querySelectorAll<HTMLElement>('.reveal').forEach((el) => observer.observe(el))
-
-    return () => observer.disconnect()
-  }, [loading])
 
   const currentYear = new Date().getFullYear()
   const closeMobileMenu = () => setMobileMenuOpen(false)
@@ -193,8 +190,8 @@ async def execute_trade(trade: Trade):
         </div>
 
         <div className="hero-content">
-          <h1 className={`hero-title${heroVisible ? ' visible' : ''}`}>Дима Киселев</h1>
-          <p className={`hero-subtitle${heroVisible ? ' visible' : ''}`}>back-end developer</p>
+          <h1 className="hero-title">Дима Киселев</h1>
+          <p className="hero-subtitle">back-end developer</p>
         </div>
         <div className="scroll-indicator" ref={scrollIndicatorRef}>
           <div className="scroll-line" />
@@ -207,7 +204,7 @@ async def execute_trade(trade: Trade):
         <div className="container">
           <div className="section-number">001</div>
           <div className="about-grid">
-            <div className="reveal">
+            <div className="anim">
               <div className="about-label">обо мне</div>
               <p className="about-text">
                 я <strong>Дима Киселев</strong> (qqwozz) — backend-разработчик, работаю с <strong>Python</strong>, <strong>Go</strong> и <strong>C++</strong>.
@@ -217,7 +214,7 @@ async def execute_trade(trade: Trade):
                 MTUCI — Moscow Technical University of Communications and Informatics. Москва.
               </p>
             </div>
-            <div className="about-stats reveal">
+            <div className="about-stats anim">
               <div className="stat-cell">
                 <div className="stat-number">{stats.repos}</div>
                 <div className="stat-label">репозиториев</div>
@@ -244,8 +241,8 @@ async def execute_trade(trade: Trade):
       <section className="section" id="experience">
         <div className="container">
           <div className="section-number">002</div>
-          <h2 className="section-title reveal">опыт работы</h2>
-          <div className="experience-list reveal">
+          <h2 className="section-title anim">опыт работы</h2>
+          <div className="experience-list anim">
             <div className="experience-card">
               <div className="experience-header">
                 <div className="experience-role">backend-разработчик (стажёр)</div>
@@ -292,8 +289,8 @@ async def execute_trade(trade: Trade):
       <section className="section" id="projects">
         <div className="container">
           <div className="section-number">003</div>
-          <h2 className="section-title reveal">избранные проекты</h2>
-          <div className="projects-list reveal">
+          <h2 className="section-title anim">избранные проекты</h2>
+          <div className="projects-list anim">
             <a className="project-row" href="https://github.com/qqwozz/QW_Trading_Platform" target="_blank" rel="noreferrer">
               <span className="project-idx">01</span>
               <span className="project-name">qw trading platform</span>
@@ -333,8 +330,8 @@ async def execute_trade(trade: Trade):
       <section className="section" id="stack">
         <div className="container">
           <div className="section-number">004</div>
-          <h2 className="section-title reveal">стек технологий</h2>
-          <div className="features-grid reveal">
+          <h2 className="section-title anim">стек технологий</h2>
+          <div className="features-grid anim">
             <div className="feature-cell">
               <div className="feature-num">01</div>
               <div className="feature-name">бэкенд</div>
@@ -357,7 +354,7 @@ async def execute_trade(trade: Trade):
             </div>
           </div>
 
-          <div className="skills-row reveal">
+          <div className="skills-row anim">
             {[
               { icon: 'PY', name: 'python', level: 'эксперт' },
               { icon: 'GO', name: 'go', level: 'продвинутый' },
@@ -371,7 +368,7 @@ async def execute_trade(trade: Trade):
               </div>
             ))}
           </div>
-          <div className="skills-row-2 reveal">
+          <div className="skills-row-2 anim">
             {[
               { icon: 'DK', name: 'docker', level: 'продвинутый' },
               { icon: 'GT', name: 'git', level: 'эксперт' },
@@ -392,8 +389,8 @@ async def execute_trade(trade: Trade):
 
       <section className="section" id="contact">
         <div className="contact-block">
-          <h2 className="section-title-lg reveal">связаться<br />со мной</h2>
-          <div className="contact-links-wrapper reveal">
+          <h2 className="section-title-lg anim">связаться<br />со мной</h2>
+          <div className="contact-links-wrapper anim">
             <div className="contact-links">
               <a href="https://t.me/qwwozzz" target="_blank" rel="noreferrer" className="contact-link">
                 <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M11.944 0A12 12 0 000 12a12 12 0 0012 12 12 12 0 0012-12A12 12 0 0012 0h-.056zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 01.171.325c.016.093.036.306.02.472-.18 1.898-.962 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.479.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z" /></svg>
