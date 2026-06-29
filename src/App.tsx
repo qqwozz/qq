@@ -1,8 +1,10 @@
 import { useEffect, useRef, useCallback, useState } from 'react'
 import Lenis from 'lenis'
-import MacBookScene from './components/MacBookScene'
+import { useLanguage } from './i18n'
+
 
 function App() {
+  const { t } = useLanguage()
   const navbarRef = useRef<HTMLElement>(null)
   const scrollIndicatorRef = useRef<HTMLDivElement>(null)
   const backToTopRef = useRef<HTMLButtonElement>(null)
@@ -125,7 +127,7 @@ function App() {
   useEffect(() => {
     if (!ready || !heroSubRef.current) return
     const el = heroSubRef.current
-    const target = 'back-end developer'
+    const target = t('hero.subtitle')
     let i = 0
     el.textContent = ''
 
@@ -141,7 +143,7 @@ function App() {
     }, 1200)
 
     return () => clearTimeout(timeout)
-  }, [ready])
+  }, [ready, t])
 
   // IntersectionObserver for reveals
   useEffect(() => {
@@ -263,76 +265,6 @@ function App() {
     return () => cleanup.forEach((fn) => fn())
   }, [ready])
 
-  // Laptop parallax
-  useEffect(() => {
-    if (!ready) return
-    const el = document.querySelector<HTMLElement>('.macbook-scene')
-    if (!el) return
-
-    let current = { ty: -30, scale: 1, opacity: 1, rotX: 0, rotY: 0, blur: 0 }
-    let target = { ty: -30, scale: 1, opacity: 1, rotX: 0, rotY: 0, blur: 0 }
-    let scrollVel = 0
-    let lastScroll = 0
-    let lastTime = performance.now()
-    let raf = 0
-
-    const lerp = (a: number, b: number, t: number) => a + (b - a) * t
-
-    const animate = () => {
-      const t = 0.035
-      current.ty = lerp(current.ty, target.ty, t)
-      current.scale = lerp(current.scale, target.scale, t)
-      current.opacity = lerp(current.opacity, target.opacity, t)
-      current.rotX = lerp(current.rotX, target.rotX, t)
-      current.rotY = lerp(current.rotY, target.rotY, t)
-      current.blur = lerp(current.blur, target.blur, t)
-
-      el.style.transform = `translate(-50%, ${current.ty}%) scale(${current.scale}) perspective(800px) rotateX(${current.rotX}deg) rotateY(${current.rotY}deg)`
-      el.style.opacity = String(current.opacity)
-      el.style.filter = current.blur > 0.1 ? `blur(${current.blur}px)` : ''
-
-      raf = requestAnimationFrame(animate)
-    }
-
-    const onScroll = () => {
-      const scrollY = window.scrollY
-      const vh = window.innerHeight
-      const now = performance.now()
-      const dt = Math.max(now - lastTime, 1)
-      lastTime = now
-
-      const rawVel = Math.abs(scrollY - lastScroll) / dt
-      scrollVel = lerp(scrollVel, Math.min(rawVel * 10, 1), 0.12)
-      lastScroll = scrollY
-
-      const p = Math.min(scrollY / (vh * 0.85), 1)
-      const ease = p < 0.5 ? 2 * p * p : 1 - Math.pow(-2 * p + 2, 2) / 2
-
-      const velBoost = 1 + scrollVel * 0.2
-
-      target.ty = -30 + ease * 90 * velBoost
-      target.scale = 1 - ease * 0.3 * velBoost
-      target.opacity = 1 - ease * 0.55
-      target.blur = ease * 2.5
-      target.rotX = ease * 8 + scrollVel * 4
-    }
-
-    const onMouseMove = (e: MouseEvent) => {
-      const cx = window.innerWidth / 2
-      target.rotY = ((e.clientX - cx) / cx) * 3
-    }
-
-    raf = requestAnimationFrame(animate)
-    window.addEventListener('scroll', onScroll, { passive: true })
-    window.addEventListener('mousemove', onMouseMove, { passive: true })
-
-    return () => {
-      cancelAnimationFrame(raf)
-      window.removeEventListener('scroll', onScroll)
-      window.removeEventListener('mousemove', onMouseMove)
-    }
-  }, [ready])
-
   // GitHub stats
   useEffect(() => {
     fetch('https://api.github.com/users/qqwozz')
@@ -414,17 +346,17 @@ function App() {
           <div className="nav-inner">
             <a href="#" className="nav-logo">qqwozz</a>
             <div className="nav-links">
-              <a href="#about" className="nav-link">обо мне</a>
-              <a href="#experience" className="nav-link">опыт</a>
-              <a href="#projects" className="nav-link">проекты</a>
-              <a href="#stack" className="nav-link">стек</a>
-              <a href="#contact" className="nav-link">связаться</a>
+              <a href="#about" className="nav-link">{t('nav.about')}</a>
+              <a href="#experience" className="nav-link">{t('nav.experience')}</a>
+              <a href="#projects" className="nav-link">{t('nav.projects')}</a>
+              <a href="#stack" className="nav-link">{t('nav.stack')}</a>
+              <a href="#contact" className="nav-link">{t('nav.contact')}</a>
             </div>
-            <a href="#contact" className="nav-contact">связаться</a>
+            <a href="#contact" className="nav-contact">{t('nav.contact')}</a>
             <button
               className={`nav-burger${mobileMenuOpen ? ' active' : ''}`}
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              aria-label="Меню"
+              aria-label={t('aria.menu')}
               aria-expanded={mobileMenuOpen}
             >
               <span />
@@ -434,16 +366,15 @@ function App() {
           </div>
         </div>
         <div className={`mobile-menu${mobileMenuOpen ? ' open' : ''}`} ref={mobileMenuRef}>
-          <a href="#about" className="mobile-link" onClick={closeMobileMenu}>обо мне</a>
-          <a href="#experience" className="mobile-link" onClick={closeMobileMenu}>опыт</a>
-          <a href="#projects" className="mobile-link" onClick={closeMobileMenu}>проекты</a>
-          <a href="#stack" className="mobile-link" onClick={closeMobileMenu}>стек</a>
-          <a href="#contact" className="mobile-link" onClick={closeMobileMenu}>связаться</a>
+          <a href="#about" className="mobile-link" onClick={closeMobileMenu}>{t('nav.about')}</a>
+          <a href="#experience" className="mobile-link" onClick={closeMobileMenu}>{t('nav.experience')}</a>
+          <a href="#projects" className="mobile-link" onClick={closeMobileMenu}>{t('nav.projects')}</a>
+          <a href="#stack" className="mobile-link" onClick={closeMobileMenu}>{t('nav.stack')}</a>
+          <a href="#contact" className="mobile-link" onClick={closeMobileMenu}>{t('nav.contact')}</a>
         </div>
       </nav>
 
       <section className="hero" id="hero">
-        <MacBookScene />
         <div className="hero-glow" />
         <div className="hero-content">
           <h1 className="hero-title" ref={heroTitleRef}>Дима Киселев</h1>
@@ -461,31 +392,25 @@ function App() {
           <div className="section-number">001</div>
           <div className="about-grid">
             <div className="anim">
-              <div className="about-label">обо мне</div>
-              <p className="about-text">
-                я <strong>Дима Киселев</strong> (qqwozz) — backend-разработчик, работаю с <strong>Python</strong>, <strong>Go</strong> и <strong>C++</strong>.
-                <br /><br />
-                создаю микросервисы, API и high-load системы. мой подход — <strong>чистая архитектура</strong>, производительность и надёжность.
-                <br /><br />
-                MTUCI — Moscow Technical University of Communications and Informatics. Москва.
-              </p>
+              <div className="about-label">{t('about.label')}</div>
+              <p className="about-text" dangerouslySetInnerHTML={{ __html: t('about.text').replace(/\n/g, '<br /><br />') }} />
             </div>
             <div className="about-stats anim">
               <div className="stat-cell">
                 <div className="stat-number" data-target={stats.repos}>{stats.repos || <span className="skeleton" />}</div>
-                <div className="stat-label">репозиториев</div>
+                <div className="stat-label">{t('stats.repos')}</div>
               </div>
               <div className="stat-cell">
                 <div className="stat-number" data-target={stats.leetcode}>{stats.leetcode || <span className="skeleton" />}</div>
-                <div className="stat-label">leetcode решено</div>
+                <div className="stat-label">{t('stats.leetcode')}</div>
               </div>
               <div className="stat-cell">
                 <div className="stat-number" data-target={stats.followers}>{stats.followers || <span className="skeleton" />}</div>
-                <div className="stat-label">фолловеров</div>
+                <div className="stat-label">{t('stats.followers')}</div>
               </div>
               <div className="stat-cell">
                 <div className="stat-number" data-target={stats.languages}>{stats.languages}</div>
-                <div className="stat-label">языков</div>
+                <div className="stat-label">{t('stats.languages')}</div>
               </div>
             </div>
           </div>
@@ -505,18 +430,15 @@ function App() {
       <section className="section" id="experience">
         <div className="container">
           <div className="section-number">002</div>
-          <h2 className="section-title anim">опыт работы</h2>
+          <h2 className="section-title anim">{t('experience.title')}</h2>
           <div className="experience-list anim">
             <div className="experience-card">
               <div className="experience-header">
-                <div className="experience-role">backend-разработчик (стажёр)</div>
+                <div className="experience-role">{t('experience.role')}</div>
                 <div className="experience-company">Яндекс</div>
               </div>
               <div className="experience-desc">
-                разработка и поддержка backend-сервисов в рамках поисковой инфраструктуры.
-                участие в проектировании API, написание модульных и интеграционных тестов.
-                оптимизация производительности серверных компонентов, работа с распределёнными системами
-                и очередями сообщений. code review, документирование, взаимодействие с командой.
+                {t('experience.yandex.desc')}
               </div>
               <div className="experience-tags">
                 <span className="experience-tag">Python</span>
@@ -528,14 +450,11 @@ function App() {
 
             <div className="experience-card">
               <div className="experience-header">
-                <div className="experience-role">backend-разработчик (стажёр)</div>
+                <div className="experience-role">{t('experience.role')}</div>
                 <div className="experience-company">VTB</div>
               </div>
               <div className="experience-desc">
-                разработка микросервисов для внутренних банковских систем.
-                проектирование и реализация REST API для обработки платёжных операций.
-                интеграция с существующей инфраструктурой, работа с реляционными базами данных,
-                написание высоконагруженных компонентов с учётом требований безопасности и отказоустойчивости.
+                {t('experience.vtb.desc')}
               </div>
               <div className="experience-tags">
                 <span className="experience-tag">Python</span>
@@ -553,36 +472,36 @@ function App() {
       <section className="section" id="projects">
         <div className="container">
           <div className="section-number">003</div>
-          <h2 className="section-title anim">избранные проекты</h2>
+          <h2 className="section-title anim">{t('projects.title')}</h2>
           <div className="projects-list anim">
             <a className="project-row" href="https://github.com/qqwozz/QW_Trading_Platform" target="_blank" rel="noreferrer">
               <span className="project-idx">01</span>
               <span className="project-name">qw trading platform</span>
-              <span className="project-desc">крипто-биржа с C++ matching engine</span>
+              <span className="project-desc">{t('projects.p1.desc')}</span>
               <span className="project-status">C++, Go, gRPC</span>
             </a>
             <a className="project-row" href="https://github.com/qqwozz/qw_pay" target="_blank" rel="noreferrer">
               <span className="project-idx">02</span>
               <span className="project-name">qw_pay</span>
-              <span className="project-desc">микросервис платежей</span>
+              <span className="project-desc">{t('projects.p2.desc')}</span>
               <span className="project-status">Go, JWT, OTP</span>
             </a>
             <a className="project-row" href="https://github.com/qqwozz/enf-shop" target="_blank" rel="noreferrer">
               <span className="project-idx">03</span>
               <span className="project-name">enf-shop</span>
-              <span className="project-desc">интернет-магазин одежды</span>
+              <span className="project-desc">{t('projects.p3.desc')}</span>
               <span className="project-status">Django, HTMX, Docker</span>
             </a>
             <a className="project-row" href="https://github.com/qqwozz/AI-chat-bot" target="_blank" rel="noreferrer">
               <span className="project-idx">04</span>
               <span className="project-name">ai-chat-bot</span>
-              <span className="project-desc">NLP чат-бот на ИИ</span>
+              <span className="project-desc">{t('projects.p4.desc')}</span>
               <span className="project-status">Python, NLP</span>
             </a>
             <a className="project-row" href="https://github.com/qqwozz/autoadmin" target="_blank" rel="noreferrer">
               <span className="project-idx">05</span>
               <span className="project-name">autoadmin</span>
-              <span className="project-desc">API + Telegram-бот для записей</span>
+              <span className="project-desc">{t('projects.p5.desc')}</span>
               <span className="project-status">Go, SQLite, JWT</span>
             </a>
           </div>
@@ -594,36 +513,36 @@ function App() {
       <section className="section" id="stack">
         <div className="container">
           <div className="section-number">004</div>
-          <h2 className="section-title anim">стек технологий</h2>
+          <h2 className="section-title anim">{t('stack.title')}</h2>
           <div className="features-grid anim">
             <div className="feature-cell">
               <div className="feature-num">01</div>
-              <div className="feature-name">бэкенд</div>
+              <div className="feature-name">{t('stack.backend')}</div>
               <div className="feature-value">Python, Go, C++,<br />FastAPI, Django, gRPC</div>
             </div>
             <div className="feature-cell">
               <div className="feature-num">02</div>
-              <div className="feature-name">базы данных</div>
+              <div className="feature-name">{t('stack.databases')}</div>
               <div className="feature-value">PostgreSQL, MySQL,<br />Redis, SQLite</div>
             </div>
             <div className="feature-cell">
               <div className="feature-num">03</div>
-              <div className="feature-name">инфраструктура</div>
+              <div className="feature-name">{t('stack.infra')}</div>
               <div className="feature-value">Docker, Linux,<br />Nginx, Gunicorn</div>
             </div>
             <div className="feature-cell">
               <div className="feature-num">04</div>
-              <div className="feature-name">инструменты</div>
+              <div className="feature-name">{t('stack.tools')}</div>
               <div className="feature-value">Git, GitHub Actions,<br />Postman, VS Code</div>
             </div>
           </div>
 
           <div className="skills-row anim">
             {[
-              { icon: 'PY', name: 'python', level: 'эксперт' },
-              { icon: 'GO', name: 'go', level: 'продвинутый' },
-              { icon: 'C+', name: 'c++', level: 'средний' },
-              { icon: 'PG', name: 'postgresql', level: 'продвинутый' },
+              { icon: 'PY', name: 'python', level: t('skill.expert') },
+              { icon: 'GO', name: 'go', level: t('skill.advanced') },
+              { icon: 'C+', name: 'c++', level: t('skill.intermediate') },
+              { icon: 'PG', name: 'postgresql', level: t('skill.advanced') },
             ].map((s) => (
               <div className="skill-cell" key={s.name}>
                 <div className="skill-icon">{s.icon}</div>
@@ -634,10 +553,10 @@ function App() {
           </div>
           <div className="skills-row-2 anim">
             {[
-              { icon: 'DK', name: 'docker', level: 'продвинутый' },
-              { icon: 'GT', name: 'git', level: 'эксперт' },
-              { icon: 'LX', name: 'linux', level: 'продвинутый' },
-              { icon: 'GR', name: 'gRPC', level: 'средний' },
+              { icon: 'DK', name: 'docker', level: t('skill.advanced') },
+              { icon: 'GT', name: 'git', level: t('skill.expert') },
+              { icon: 'LX', name: 'linux', level: t('skill.advanced') },
+              { icon: 'GR', name: 'gRPC', level: t('skill.intermediate') },
             ].map((s) => (
               <div className="skill-cell" key={s.name}>
                 <div className="skill-icon">{s.icon}</div>
@@ -653,7 +572,7 @@ function App() {
 
       <section className="section" id="contact">
         <div className="contact-block">
-          <h2 className="section-title-lg anim">связаться<br />со мной</h2>
+          <h2 className="section-title-lg anim" dangerouslySetInnerHTML={{ __html: t('contact.title') }} />
           <div className="contact-links-wrapper anim">
             <div className="contact-links">
               <a href="https://t.me/qqqwozz" target="_blank" rel="noreferrer" className="contact-link">
@@ -690,7 +609,7 @@ function App() {
               <a href="https://t.me/qqqwozz" target="_blank" rel="noreferrer">telegram</a>
               <a href="https://instagram.com/qqqwozz" target="_blank" rel="noreferrer">instagram</a>
               <a href="https://leetcode.com/u/oonixxxxx/" target="_blank" rel="noreferrer">leetcode</a>
-              <a href="#contact">связаться</a>
+              <a href="#contact">{t('footer.contact')}</a>
             </div>
           </div>
         </div>
@@ -700,7 +619,7 @@ function App() {
         className="back-to-top"
         ref={backToTopRef}
         onClick={() => window.scrollTo({ top: 0 })}
-        aria-label="Наверх"
+        aria-label={t('aria.top')}
       >
         <svg viewBox="0 0 24 24" aria-hidden="true"><polyline points="18 15 12 9 6 15" /></svg>
       </button>
