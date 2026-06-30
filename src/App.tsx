@@ -12,8 +12,6 @@ import { ContactSection } from './components/ContactSection'
 import { Footer } from './components/Footer'
 import { ThemeToggle } from './components/ThemeToggle'
 
-
-
 function App() {
   const { t } = useLanguage()
   const navbarRef = useRef<HTMLElement>(null)
@@ -100,10 +98,17 @@ function App() {
 
   useEffect(() => {
     import('lenis').then(({ default: Lenis }) => {
-      const lenis = new Lenis({ duration: 1.0, easing: (t: number) => Math.min(1, 1.001 - Math.pow(2, -10 * t)), smoothWheel: true })
-      const raf = (time: number) => { lenis.raf(time); requestAnimationFrame(raf) }
+      const lenis = new Lenis({
+        duration: 1.0,
+        easing: (t: number) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
+        smoothWheel: true
+      })
+      const raf = (time: number) => {
+        lenis.raf(time)
+        requestAnimationFrame(raf)
+      }
       requestAnimationFrame(raf)
-    })
+    }).catch(() => {})
   }, [])
 
   useEffect(() => {
@@ -269,7 +274,6 @@ function App() {
     return () => cleanup.forEach((fn) => fn())
   }, [ready])
 
-  // Parallax effect for hero
   useEffect(() => {
     if (!ready) return
     const heroGlow = document.querySelector('.hero-glow') as HTMLElement
@@ -291,7 +295,6 @@ function App() {
     return () => window.removeEventListener('scroll', onScroll)
   }, [ready])
 
-  // Section progress animation
   useEffect(() => {
     if (!ready) return
     const sections = document.querySelectorAll<HTMLElement>('section[id]')
