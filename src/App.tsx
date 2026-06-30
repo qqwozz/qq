@@ -91,8 +91,8 @@ function App() {
   }, [mobileMenuOpen])
 
   useEffect(() => {
-    const t1 = setTimeout(() => setLoadingFade(true), 600)
-    const t2 = setTimeout(() => { setLoading(false); setReady(true) }, 1000)
+    const t1 = setTimeout(() => setLoadingFade(true), 1200)
+    const t2 = setTimeout(() => { setLoading(false); setReady(true) }, 1600)
     return () => { clearTimeout(t1); clearTimeout(t2) }
   }, [])
 
@@ -314,7 +314,12 @@ function App() {
     <>
       {loading && (
         <div className={`loading-screen${loadingFade ? ' fade-out' : ''}`}>
-          <div className="loading-spinner" />
+          <div className="loading-brand">
+            <div className="loading-logo">qqwozz</div>
+            <div className="loading-bar">
+              <div className="loading-bar-fill" />
+            </div>
+          </div>
         </div>
       )}
 

@@ -10,6 +10,16 @@ export function HeroSection({ heroTitleRef, heroSubRef, scrollIndicatorRef }: He
   return (
     <section className="hero" id="hero">
       <div className="hero-glow" />
+      <div className="hero-particles">
+        <div className="hero-particle" />
+        <div className="hero-particle" />
+        <div className="hero-particle" />
+        <div className="hero-particle" />
+        <div className="hero-particle" />
+        <div className="hero-particle" />
+        <div className="hero-particle" />
+        <div className="hero-particle" />
+      </div>
       <div className="hero-content">
         <h1 className="hero-title" ref={heroTitleRef}>Дима Киселев</h1>
         <p className="hero-subtitle" ref={heroSubRef}></p>
