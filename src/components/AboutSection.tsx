@@ -11,7 +11,10 @@ export function AboutSection({ t, stats }: AboutProps) {
   return (
     <section className="section" id="about">
       <div className="container">
-        <div className="section-number">001</div>
+        <div className="section-number">
+          001
+          <div className="section-number-progress" />
+        </div>
         <div className="about-grid">
           <div className="anim">
             <div className="about-label">{t('about.label')}</div>

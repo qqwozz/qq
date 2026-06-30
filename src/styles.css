@@ -1469,3 +1469,236 @@ a:focus-visible {
     .hero-subtitle { margin-top: var(--space-sm); }
     .scroll-indicator { display: none; }
 }
+
+/* ========== THEME TOGGLE ========== */
+.theme-toggle {
+    position: fixed;
+    top: 18px;
+    right: 24px;
+    z-index: 101;
+    width: 36px;
+    height: 36px;
+    border: 1px solid var(--glass-border);
+    background: var(--glass-bg);
+    backdrop-filter: blur(var(--glass-blur));
+    -webkit-backdrop-filter: blur(var(--glass-blur));
+    border-radius: var(--radius-full);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all var(--duration-normal) var(--ease-out);
+    color: var(--text-secondary);
+}
+
+.theme-toggle svg {
+    width: 16px;
+    height: 16px;
+}
+
+.theme-toggle:hover {
+    border-color: var(--glass-border-hover);
+    background: var(--glass-bg-hover);
+    color: var(--text-primary);
+    transform: scale(1.1);
+}
+
+.theme-toggle:active {
+    transform: scale(0.95);
+}
+
+/* ========== LIGHT MODE ========== */
+html.light {
+    --bg-deep: #f8f9fa;
+    --bg-base: #ffffff;
+    --bg-elevated: #f1f3f5;
+    --bg-card: #ffffff;
+    --bg-card-hover: #f8f9fa;
+
+    --text-primary: #1a1a1a;
+    --text-secondary: #495057;
+    --text-muted: #868e96;
+
+    --accent: #1a1a1a;
+    --accent-dim: rgba(0, 0, 0, 0.04);
+    --accent-glow: rgba(0, 0, 0, 0.08);
+
+    --border: rgba(0, 0, 0, 0.08);
+    --border-hover: rgba(0, 0, 0, 0.15);
+
+    --glass-bg: rgba(255, 255, 255, 0.7);
+    --glass-bg-hover: rgba(255, 255, 255, 0.85);
+    --glass-border: rgba(0, 0, 0, 0.08);
+    --glass-border-hover: rgba(0, 0, 0, 0.15);
+    --glass-reflection: linear-gradient(135deg, rgba(255,255,255,0.8) 0%, transparent 40%, transparent 60%, rgba(255,255,255,0.4) 100%);
+
+    --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.08);
+    --shadow-md: 0 4px 24px rgba(0, 0, 0, 0.12);
+    --shadow-lg: 0 8px 48px rgba(0, 0, 0, 0.16);
+    --shadow-glow: 0 0 20px rgba(0, 0, 0, 0.04);
+}
+
+html.light body {
+    background: var(--bg-deep);
+}
+
+html.light body::before {
+    background:
+        radial-gradient(ellipse 900px 700px at 25% 15%, rgba(0, 0, 0, 0.02) 0%, transparent 55%),
+        radial-gradient(ellipse 700px 900px at 75% 85%, rgba(0, 0, 0, 0.015) 0%, transparent 55%);
+}
+
+html.light .navbar {
+    background: rgba(248, 249, 250, 0.8);
+    border-bottom-color: var(--glass-border);
+}
+
+html.light .navbar.scrolled {
+    background: rgba(248, 249, 250, 0.95);
+    box-shadow: 0 1px 0 var(--glass-border), var(--shadow-sm);
+}
+
+html.light .loading-screen {
+    background: var(--bg-deep);
+}
+
+html.light .hero-glow {
+    background: radial-gradient(circle,
+        rgba(0, 0, 0, 0.03) 0%,
+        rgba(0, 0, 0, 0.01) 35%,
+        transparent 65%);
+}
+
+html.light .hero-particle {
+    background: rgba(0, 0, 0, 0.2);
+}
+
+html.light .scroll-line {
+    background: linear-gradient(to bottom, rgba(0,0,0,0.4), transparent);
+}
+
+html.light .noise-overlay {
+    opacity: 0.02;
+}
+
+html.light .progress-bar {
+    background: rgba(0, 0, 0, 0.3);
+}
+
+html.light .skeleton {
+    background: linear-gradient(90deg, rgba(0,0,0,0.06) 25%, rgba(0,0,0,0.1) 50%, rgba(0,0,0,0.06) 75%);
+}
+
+html.light .nav-logo {
+    color: var(--text-primary);
+}
+
+html.light .nav-link {
+    color: var(--text-muted);
+}
+
+html.light .nav-link::after {
+    background: #1a1a1a;
+}
+
+html.light .nav-contact {
+    color: var(--text-muted);
+    border-color: var(--border);
+}
+
+html.light .back-to-top {
+    background: var(--glass-bg);
+    border-color: var(--glass-border);
+}
+
+html.light .back-to-top svg {
+    stroke: var(--text-secondary);
+}
+
+html.light .footer {
+    border-top-color: var(--border);
+}
+
+html.light .divider {
+    background: linear-gradient(to bottom, transparent, rgba(0,0,0,0.12), transparent);
+}
+
+html.light .marquee-wrapper {
+    border-color: var(--glass-border);
+}
+
+@media (max-width: 767px) {
+    .mobile-menu {
+        background: rgba(248, 249, 250, 0.98);
+    }
+}
+
+/* ========== PROJECT TOOLTIP ========== */
+.project-row {
+    position: relative;
+}
+
+.project-tooltip {
+    display: none;
+    position: absolute;
+    bottom: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    padding: 8px 12px;
+    background: var(--bg-elevated);
+    border: 1px solid var(--glass-border);
+    border-radius: var(--radius-sm);
+    font-size: 12px;
+    color: var(--text-secondary);
+    white-space: nowrap;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity var(--duration-normal) var(--ease-out);
+    z-index: 10;
+}
+
+@media (max-width: 767px) {
+    .project-desc {
+        display: none !important;
+    }
+    .project-row:hover .project-tooltip {
+        display: block;
+        opacity: 1;
+    }
+}
+
+/* ========== SECTION PROGRESS ========== */
+.section-number {
+    position: relative;
+}
+
+.section-number-progress {
+    position: absolute;
+    bottom: -8px;
+    left: 0;
+    width: 0;
+    height: 1px;
+    background: var(--text-primary);
+    transition: width 0.3s var(--ease-out);
+}
+
+/* ========== ANIMATED SOCIAL LINKS ========== */
+.contact-link {
+    transition: all var(--duration-normal) var(--ease-out);
+}
+
+.contact-link:nth-child(1):hover { transform: translateY(-3px) scale(1.02); }
+.contact-link:nth-child(2):hover { transform: translateY(-3px) scale(1.02) rotate(-2deg); }
+.contact-link:nth-child(3):hover { transform: translateY(-3px) scale(1.02) rotate(2deg); }
+.contact-link:nth-child(4):hover { transform: translateY(-3px) scale(1.02); }
+.contact-link:nth-child(5):hover { transform: translateY(-3px) scale(1.02); }
+
+.contact-link svg {
+    transition: all var(--duration-normal) var(--ease-out);
+}
+
+.contact-link:nth-child(1):hover svg { transform: scale(1.15) rotate(-5deg); }
+.contact-link:nth-child(2):hover svg { transform: scale(1.15) rotate(5deg); }
+.contact-link:nth-child(3):hover svg { transform: scale(1.15) rotate(-5deg); }
+.contact-link:nth-child(4):hover svg { transform: scale(1.15) rotate(5deg); }
+.contact-link:nth-child(5):hover svg { transform: scale(1.15); }

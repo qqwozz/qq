@@ -1,4 +1,5 @@
 import { TranslationKey } from '../i18n'
+
 interface StackProps {
   t: (key: TranslationKey) => string
 }
@@ -21,7 +22,10 @@ export function StackSection({ t }: StackProps) {
   return (
     <section className="section" id="stack">
       <div className="container">
-        <div className="section-number">004</div>
+        <div className="section-number">
+          004
+          <div className="section-number-progress" />
+        </div>
         <h2 className="section-title anim">{t('stack.title')}</h2>
         <div className="features-grid anim">
           <div className="feature-cell">

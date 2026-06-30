@@ -1,4 +1,5 @@
 import { TranslationKey } from '../i18n'
+
 interface ExperienceProps {
   t: (key: TranslationKey) => string
 }
@@ -7,7 +8,10 @@ export function ExperienceSection({ t }: ExperienceProps) {
   return (
     <section className="section" id="experience">
       <div className="container">
-        <div className="section-number">002</div>
+        <div className="section-number">
+          002
+          <div className="section-number-progress" />
+        </div>
         <h2 className="section-title anim">{t('experience.title')}</h2>
         <div className="experience-list anim">
           <div className="experience-card">

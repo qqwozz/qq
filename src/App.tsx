@@ -11,6 +11,7 @@ import { ProjectsSection } from './components/ProjectsSection'
 import { StackSection } from './components/StackSection'
 import { ContactSection } from './components/ContactSection'
 import { Footer } from './components/Footer'
+import { ThemeToggle } from './components/ThemeToggle'
 
 function App() {
   const { t } = useLanguage()
@@ -130,6 +131,50 @@ function App() {
     return () => clearInterval(interval)
   }, [ready])
 
+  // Parallax effect for hero
+  useEffect(() => {
+    if (!ready) return
+    const heroGlow = document.querySelector('.hero-glow') as HTMLElement
+    const heroParticles = document.querySelector('.hero-particles') as HTMLElement
+    if (!heroGlow || !heroParticles) return
+
+    const onScroll = () => {
+      const scrollY = window.scrollY
+      const heroHeight = window.innerHeight
+      if (scrollY > heroHeight) return
+
+      const progress = scrollY / heroHeight
+      heroGlow.style.transform = `translate(-50%, calc(-50% + ${progress * 100}px))`
+      heroParticles.style.transform = `translateY(${progress * 50}px)`
+      heroParticles.style.opacity = String(1 - progress * 0.8)
+    }
+
+    window.addEventListener('scroll', onScroll, { passive: true })
+    return () => window.removeEventListener('scroll', onScroll)
+  }, [ready])
+
+  // Section progress animation
+  useEffect(() => {
+    if (!ready) return
+    const sections = document.querySelectorAll<HTMLElement>('section[id]')
+    const progressBars = document.querySelectorAll<HTMLElement>('.section-number-progress')
+
+    const onScroll = () => {
+      sections.forEach((section, i) => {
+        const rect = section.getBoundingClientRect()
+        const windowHeight = window.innerHeight
+        const progress = Math.max(0, Math.min(1, (windowHeight - rect.top) / (windowHeight + rect.height)))
+        if (progressBars[i]) {
+          (progressBars[i] as HTMLElement).style.width = `${progress * 100}%`
+        }
+      })
+    }
+
+    window.addEventListener('scroll', onScroll, { passive: true })
+    onScroll()
+    return () => window.removeEventListener('scroll', onScroll)
+  }, [ready])
+
   useEffect(() => {
     if (!ready || !heroSubRef.current) return
     const el = heroSubRef.current
@@ -166,6 +211,50 @@ function App() {
     )
     document.querySelectorAll<HTMLElement>('.anim').forEach((el) => observer.observe(el))
     return () => observer.disconnect()
+  }, [ready])
+
+  // Parallax effect for hero
+  useEffect(() => {
+    if (!ready) return
+    const heroGlow = document.querySelector('.hero-glow') as HTMLElement
+    const heroParticles = document.querySelector('.hero-particles') as HTMLElement
+    if (!heroGlow || !heroParticles) return
+
+    const onScroll = () => {
+      const scrollY = window.scrollY
+      const heroHeight = window.innerHeight
+      if (scrollY > heroHeight) return
+
+      const progress = scrollY / heroHeight
+      heroGlow.style.transform = `translate(-50%, calc(-50% + ${progress * 100}px))`
+      heroParticles.style.transform = `translateY(${progress * 50}px)`
+      heroParticles.style.opacity = String(1 - progress * 0.8)
+    }
+
+    window.addEventListener('scroll', onScroll, { passive: true })
+    return () => window.removeEventListener('scroll', onScroll)
+  }, [ready])
+
+  // Section progress animation
+  useEffect(() => {
+    if (!ready) return
+    const sections = document.querySelectorAll<HTMLElement>('section[id]')
+    const progressBars = document.querySelectorAll<HTMLElement>('.section-number-progress')
+
+    const onScroll = () => {
+      sections.forEach((section, i) => {
+        const rect = section.getBoundingClientRect()
+        const windowHeight = window.innerHeight
+        const progress = Math.max(0, Math.min(1, (windowHeight - rect.top) / (windowHeight + rect.height)))
+        if (progressBars[i]) {
+          (progressBars[i] as HTMLElement).style.width = `${progress * 100}%`
+        }
+      })
+    }
+
+    window.addEventListener('scroll', onScroll, { passive: true })
+    onScroll()
+    return () => window.removeEventListener('scroll', onScroll)
   }, [ready])
 
   useEffect(() => {
@@ -216,6 +305,50 @@ function App() {
     return () => cleanup.forEach((fn) => fn())
   }, [ready])
 
+  // Parallax effect for hero
+  useEffect(() => {
+    if (!ready) return
+    const heroGlow = document.querySelector('.hero-glow') as HTMLElement
+    const heroParticles = document.querySelector('.hero-particles') as HTMLElement
+    if (!heroGlow || !heroParticles) return
+
+    const onScroll = () => {
+      const scrollY = window.scrollY
+      const heroHeight = window.innerHeight
+      if (scrollY > heroHeight) return
+
+      const progress = scrollY / heroHeight
+      heroGlow.style.transform = `translate(-50%, calc(-50% + ${progress * 100}px))`
+      heroParticles.style.transform = `translateY(${progress * 50}px)`
+      heroParticles.style.opacity = String(1 - progress * 0.8)
+    }
+
+    window.addEventListener('scroll', onScroll, { passive: true })
+    return () => window.removeEventListener('scroll', onScroll)
+  }, [ready])
+
+  // Section progress animation
+  useEffect(() => {
+    if (!ready) return
+    const sections = document.querySelectorAll<HTMLElement>('section[id]')
+    const progressBars = document.querySelectorAll<HTMLElement>('.section-number-progress')
+
+    const onScroll = () => {
+      sections.forEach((section, i) => {
+        const rect = section.getBoundingClientRect()
+        const windowHeight = window.innerHeight
+        const progress = Math.max(0, Math.min(1, (windowHeight - rect.top) / (windowHeight + rect.height)))
+        if (progressBars[i]) {
+          (progressBars[i] as HTMLElement).style.width = `${progress * 100}%`
+        }
+      })
+    }
+
+    window.addEventListener('scroll', onScroll, { passive: true })
+    onScroll()
+    return () => window.removeEventListener('scroll', onScroll)
+  }, [ready])
+
   useEffect(() => {
     if (!ready) return
     const cards = document.querySelectorAll<HTMLElement>('.stat-cell, .feature-cell, .skill-cell, .experience-card')
@@ -235,6 +368,50 @@ function App() {
     })
 
     return () => cleanup.forEach((fn) => fn())
+  }, [ready])
+
+  // Parallax effect for hero
+  useEffect(() => {
+    if (!ready) return
+    const heroGlow = document.querySelector('.hero-glow') as HTMLElement
+    const heroParticles = document.querySelector('.hero-particles') as HTMLElement
+    if (!heroGlow || !heroParticles) return
+
+    const onScroll = () => {
+      const scrollY = window.scrollY
+      const heroHeight = window.innerHeight
+      if (scrollY > heroHeight) return
+
+      const progress = scrollY / heroHeight
+      heroGlow.style.transform = `translate(-50%, calc(-50% + ${progress * 100}px))`
+      heroParticles.style.transform = `translateY(${progress * 50}px)`
+      heroParticles.style.opacity = String(1 - progress * 0.8)
+    }
+
+    window.addEventListener('scroll', onScroll, { passive: true })
+    return () => window.removeEventListener('scroll', onScroll)
+  }, [ready])
+
+  // Section progress animation
+  useEffect(() => {
+    if (!ready) return
+    const sections = document.querySelectorAll<HTMLElement>('section[id]')
+    const progressBars = document.querySelectorAll<HTMLElement>('.section-number-progress')
+
+    const onScroll = () => {
+      sections.forEach((section, i) => {
+        const rect = section.getBoundingClientRect()
+        const windowHeight = window.innerHeight
+        const progress = Math.max(0, Math.min(1, (windowHeight - rect.top) / (windowHeight + rect.height)))
+        if (progressBars[i]) {
+          (progressBars[i] as HTMLElement).style.width = `${progress * 100}%`
+        }
+      })
+    }
+
+    window.addEventListener('scroll', onScroll, { passive: true })
+    onScroll()
+    return () => window.removeEventListener('scroll', onScroll)
   }, [ready])
 
   useEffect(() => {
@@ -264,6 +441,50 @@ function App() {
     })
 
     return () => cleanup.forEach((fn) => fn())
+  }, [ready])
+
+  // Parallax effect for hero
+  useEffect(() => {
+    if (!ready) return
+    const heroGlow = document.querySelector('.hero-glow') as HTMLElement
+    const heroParticles = document.querySelector('.hero-particles') as HTMLElement
+    if (!heroGlow || !heroParticles) return
+
+    const onScroll = () => {
+      const scrollY = window.scrollY
+      const heroHeight = window.innerHeight
+      if (scrollY > heroHeight) return
+
+      const progress = scrollY / heroHeight
+      heroGlow.style.transform = `translate(-50%, calc(-50% + ${progress * 100}px))`
+      heroParticles.style.transform = `translateY(${progress * 50}px)`
+      heroParticles.style.opacity = String(1 - progress * 0.8)
+    }
+
+    window.addEventListener('scroll', onScroll, { passive: true })
+    return () => window.removeEventListener('scroll', onScroll)
+  }, [ready])
+
+  // Section progress animation
+  useEffect(() => {
+    if (!ready) return
+    const sections = document.querySelectorAll<HTMLElement>('section[id]')
+    const progressBars = document.querySelectorAll<HTMLElement>('.section-number-progress')
+
+    const onScroll = () => {
+      sections.forEach((section, i) => {
+        const rect = section.getBoundingClientRect()
+        const windowHeight = window.innerHeight
+        const progress = Math.max(0, Math.min(1, (windowHeight - rect.top) / (windowHeight + rect.height)))
+        if (progressBars[i]) {
+          (progressBars[i] as HTMLElement).style.width = `${progress * 100}%`
+        }
+      })
+    }
+
+    window.addEventListener('scroll', onScroll, { passive: true })
+    onScroll()
+    return () => window.removeEventListener('scroll', onScroll)
   }, [ready])
 
   useEffect(() => {
@@ -324,6 +545,7 @@ function App() {
       )}
 
       <div className="noise-overlay" />
+      <ThemeToggle />
       <div className="progress-bar" ref={progressRef} />
 
       <Navbar
