@@ -1,0 +1,22 @@
+import { Ref } from 'react'
+
+interface HeroProps {
+  heroTitleRef: Ref<HTMLHeadingElement>
+  heroSubRef: Ref<HTMLParagraphElement>
+  scrollIndicatorRef: Ref<HTMLDivElement>
+}
+
+export function HeroSection({ heroTitleRef, heroSubRef, scrollIndicatorRef }: HeroProps) {
+  return (
+    <section className="hero" id="hero">
+      <div className="hero-glow" />
+      <div className="hero-content">
+        <h1 className="hero-title" ref={heroTitleRef}>Дима Киселев</h1>
+        <p className="hero-subtitle" ref={heroSubRef}></p>
+      </div>
+      <div className="scroll-indicator" ref={scrollIndicatorRef}>
+        <div className="scroll-line" />
+      </div>
+    </section>
+  )
+}

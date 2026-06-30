@@ -76,7 +76,7 @@ const translations = {
 } as const
 
 type Lang = keyof typeof translations
-type TranslationKey = keyof typeof translations['ru']
+export type TranslationKey = keyof typeof translations['ru']
 
 function detectLang(): Lang {
   const nav = (navigator.language || '').toLowerCase()
