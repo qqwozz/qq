@@ -1702,3 +1702,111 @@ html.light .marquee-wrapper {
 .contact-link:nth-child(3):hover svg { transform: scale(1.15) rotate(-5deg); }
 .contact-link:nth-child(4):hover svg { transform: scale(1.15) rotate(5deg); }
 .contact-link:nth-child(5):hover svg { transform: scale(1.15); }
+
+/* ========== ANIMATED NOISE ========== */
+@keyframes noiseAnim {
+    0% { transform: translate(0, 0); }
+    10% { transform: translate(-5%, -5%); }
+    20% { transform: translate(-10%, 5%); }
+    30% { transform: translate(5%, -10%); }
+    40% { transform: translate(-5%, 15%); }
+    50% { transform: translate(-10%, 5%); }
+    60% { transform: translate(15%, 0); }
+    70% { transform: translate(0, 10%); }
+    80% { transform: translate(-15%, 0); }
+    90% { transform: translate(10%, 5%); }
+    100% { transform: translate(5%, 0); }
+}
+
+.noise-overlay {
+    animation: noiseAnim 8s steps(10) infinite;
+}
+
+/* ========== CARD DEPTH LAYERS ========== */
+.stat-cell { --depth: 1; }
+.feature-cell { --depth: 1; }
+.skill-cell { --depth: 1; }
+.experience-card { --depth: 2; }
+.project-row { --depth: 1; }
+.contact-link { --depth: 1; }
+
+.stat-cell:hover { box-shadow: 0 4px 12px rgba(0,0,0,0.15), 0 8px 24px rgba(0,0,0,0.1); }
+.feature-cell:hover { box-shadow: 0 4px 12px rgba(0,0,0,0.15), 0 8px 24px rgba(0,0,0,0.1); }
+.skill-cell:hover { box-shadow: 0 4px 12px rgba(0,0,0,0.15), 0 8px 24px rgba(0,0,0,0.1); }
+.experience-card:hover { box-shadow: 0 6px 16px rgba(0,0,0,0.2), 0 12px 32px rgba(0,0,0,0.15); }
+.project-row:hover { box-shadow: 0 4px 12px rgba(0,0,0,0.15), 0 8px 24px rgba(0,0,0,0.1); }
+.contact-link:hover { box-shadow: 0 4px 12px rgba(0,0,0,0.15), 0 8px 24px rgba(0,0,0,0.1); }
+
+html.light .stat-cell:hover { box-shadow: 0 4px 12px rgba(0,0,0,0.06), 0 8px 24px rgba(0,0,0,0.04); }
+html.light .feature-cell:hover { box-shadow: 0 4px 12px rgba(0,0,0,0.06), 0 8px 24px rgba(0,0,0,0.04); }
+html.light .skill-cell:hover { box-shadow: 0 4px 12px rgba(0,0,0,0.06), 0 8px 24px rgba(0,0,0,0.04); }
+html.light .experience-card:hover { box-shadow: 0 6px 16px rgba(0,0,0,0.08), 0 12px 32px rgba(0,0,0,0.06); }
+html.light .project-row:hover { box-shadow: 0 4px 12px rgba(0,0,0,0.06), 0 8px 24px rgba(0,0,0,0.04); }
+html.light .contact-link:hover { box-shadow: 0 4px 12px rgba(0,0,0,0.06), 0 8px 24px rgba(0,0,0,0.04); }
+
+/* ========== SCROLL SECTION INDICATOR ========== */
+.nav-link {
+    position: relative;
+}
+
+.nav-link::before {
+    content: '';
+    position: absolute;
+    bottom: -2px;
+    left: 0;
+    width: 0;
+    height: 2px;
+    background: var(--text-primary);
+    transition: width var(--duration-normal) var(--ease-out);
+    border-radius: var(--radius-full);
+}
+
+.nav-link.active::before {
+    width: 100%;
+}
+
+.nav-link.active {
+    color: var(--text-primary) !important;
+}
+
+/* ========== LOADING SKELETON ========== */
+.skeleton-card {
+    background: var(--glass-bg);
+    border: 1px solid var(--glass-border);
+    border-radius: var(--radius-lg);
+    padding: var(--space-xl);
+    position: relative;
+    overflow: hidden;
+}
+
+.skeleton-card::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.04), transparent);
+    animation: skeletonShimmer 1.5s ease-in-out infinite;
+}
+
+@keyframes skeletonShimmer {
+    0% { transform: translateX(-100%); }
+    100% { transform: translateX(100%); }
+}
+
+.skeleton-line {
+    height: 12px;
+    background: rgba(255,255,255,0.06);
+    border-radius: var(--radius-sm);
+    margin-bottom: var(--space-sm);
+}
+
+.skeleton-line.wide { width: 80%; }
+.skeleton-line.medium { width: 60%; }
+.skeleton-line.narrow { width: 40%; }
+
+html.light .skeleton-card::after {
+    background: linear-gradient(90deg, transparent, rgba(0,0,0,0.03), transparent);
+}
+
+html.light .skeleton-line {
+    background: rgba(0,0,0,0.06);
+}
