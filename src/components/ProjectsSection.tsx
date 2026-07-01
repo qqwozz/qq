@@ -18,6 +18,10 @@ export function ProjectsSection({ t }: ProjectsProps) {
       about: t('projects.p1.about'),
       features: [t('projects.p1.feat1'), t('projects.p1.feat2'), t('projects.p1.feat3'), t('projects.p1.feat4')],
       tech: ['Go', 'C++17', 'PostgreSQL', 'Redis', 'gRPC', 'Docker', 'React'],
+      category: 'fintech',
+      categoryColor: '#1a6bff',
+      metrics: ['1000+ orders/sec', '6 microservices'],
+      architecture: 'Client → API Gateway → Order Service → Matching Engine (C++) → PostgreSQL',
     },
     {
       idx: '02',
@@ -28,6 +32,10 @@ export function ProjectsSection({ t }: ProjectsProps) {
       about: t('projects.p2.about'),
       features: [t('projects.p2.feat1'), t('projects.p2.feat2'), t('projects.p2.feat3'), t('projects.p2.feat4')],
       tech: ['Go', 'C++', 'Python', 'PostgreSQL', 'Redis', 'Docker'],
+      category: 'fintech',
+      categoryColor: '#1a6bff',
+      metrics: ['200+ currencies', 'anti-fraud <1ms'],
+      architecture: 'API Gateway → Transaction Service → PostgreSQL + Anti-Fraud (C++ + Python)',
     },
     {
       idx: '03',
@@ -38,6 +46,10 @@ export function ProjectsSection({ t }: ProjectsProps) {
       about: t('projects.p3.about'),
       features: [t('projects.p3.feat1'), t('projects.p3.feat2'), t('projects.p3.feat3'), t('projects.p3.feat4')],
       tech: ['Django', 'PostgreSQL', 'Redis', 'HTMX', 'Stripe', 'Docker'],
+      category: 'e-commerce',
+      categoryColor: '#e67e22',
+      metrics: ['Stripe integration', 'Docker production'],
+      architecture: 'Nginx → Gunicorn → Django → PostgreSQL + Redis + Stripe',
     },
     {
       idx: '04',
@@ -48,6 +60,10 @@ export function ProjectsSection({ t }: ProjectsProps) {
       about: t('projects.p4.about'),
       features: [t('projects.p4.feat1'), t('projects.p4.feat2'), t('projects.p4.feat3'), t('projects.p4.feat4')],
       tech: ['Python', 'Streamlit', 'GigaChat API', 'OAuth 2.0'],
+      category: 'ai',
+      categoryColor: '#9b59b6',
+      metrics: ['GigaChat NLP', 'Russian language'],
+      architecture: 'User → Streamlit UI → GigaChat API → OAuth 2.0 → Response',
     },
     {
       idx: '05',
@@ -58,6 +74,10 @@ export function ProjectsSection({ t }: ProjectsProps) {
       about: t('projects.p5.about'),
       features: [t('projects.p5.feat1'), t('projects.p5.feat2'), t('projects.p5.feat3'), t('projects.p5.feat4')],
       tech: ['Go', 'SQLite', 'Telegram Bot API', 'JWT', 'Docker'],
+      category: 'saas',
+      categoryColor: '#27ae60',
+      metrics: ['13 DB tables', 'REST + Telegram'],
+      architecture: 'Telegram Bot → REST API (Go) → SQLite + JWT Auth',
     },
   ]
 
@@ -71,7 +91,11 @@ export function ProjectsSection({ t }: ProjectsProps) {
         <h2 className="section-title anim">{t('projects.title')}</h2>
         <div className="projects-list anim">
           {projects.map((p, i) => (
-            <div key={p.idx} className={`project-item${active === i ? ' open' : ''}`}>
+            <div
+              key={p.idx}
+              className={`project-item${active === i ? ' open' : ''}`}
+              style={{ '--project-color': p.categoryColor } as React.CSSProperties}
+            >
               <div
                 className="project-row"
                 onClick={() => setActive(active === i ? null : i)}
@@ -81,6 +105,7 @@ export function ProjectsSection({ t }: ProjectsProps) {
               >
                 <span className="project-idx">{p.idx}</span>
                 <span className="project-name">{p.name}</span>
+                <span className="project-category" style={{ color: p.categoryColor, borderColor: p.categoryColor + '40', background: p.categoryColor + '10' }}>{p.category}</span>
                 <span className="project-desc">{p.desc}</span>
                 <span className="project-status">{p.status}</span>
                 <span className="project-chevron">
@@ -92,11 +117,20 @@ export function ProjectsSection({ t }: ProjectsProps) {
               {active === i && (
                 <div className="project-detail">
                   <p className="project-detail-about">{p.about}</p>
+                  <div className="project-detail-metrics">
+                    {p.metrics.map((m, mi) => (
+                      <span key={mi} className="project-metric" style={{ borderColor: p.categoryColor + '30', color: p.categoryColor }}>{m}</span>
+                    ))}
+                  </div>
                   <div className="project-detail-section">
                     <div className="project-detail-label">ключевые особенности</div>
                     <ul className="project-detail-features">
                       {p.features.map((f, fi) => <li key={fi}>{f}</li>)}
                     </ul>
+                  </div>
+                  <div className="project-detail-section">
+                    <div className="project-detail-label">архитектура</div>
+                    <div className="project-detail-architecture">{p.architecture}</div>
                   </div>
                   <div className="project-detail-section">
                     <div className="project-detail-label">стек</div>
