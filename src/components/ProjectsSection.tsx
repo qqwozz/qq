@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect, useRef, useCallback } from 'react'
 import { TranslationKey } from '../i18n'
 
 interface ProjectsProps {
@@ -7,6 +7,8 @@ interface ProjectsProps {
 
 export function ProjectsSection({ t }: ProjectsProps) {
   const [active, setActive] = useState<number | null>(null)
+  const sectionRef = useRef<HTMLElement>(null)
+  const itemRefs = useRef<(HTMLDivElement | null)[]>([])
 
   const projects = [
     {
@@ -22,6 +24,7 @@ export function ProjectsSection({ t }: ProjectsProps) {
       categoryColor: '#1a6bff',
       metrics: ['1000+ orders/sec', '6 microservices'],
       architecture: 'Client → API Gateway → Order Service → Matching Engine (C++) → PostgreSQL',
+      completed: true,
     },
     {
       idx: '02',
@@ -36,6 +39,7 @@ export function ProjectsSection({ t }: ProjectsProps) {
       categoryColor: '#1a6bff',
       metrics: ['200+ currencies', 'anti-fraud <1ms'],
       architecture: 'API Gateway → Transaction Service → PostgreSQL + Anti-Fraud (C++ + Python)',
+      completed: true,
     },
     {
       idx: '03',
@@ -50,6 +54,7 @@ export function ProjectsSection({ t }: ProjectsProps) {
       categoryColor: '#e67e22',
       metrics: ['Stripe integration', 'Docker production'],
       architecture: 'Nginx → Gunicorn → Django → PostgreSQL + Redis + Stripe',
+      completed: true,
     },
     {
       idx: '04',
@@ -64,6 +69,7 @@ export function ProjectsSection({ t }: ProjectsProps) {
       categoryColor: '#9b59b6',
       metrics: ['GigaChat NLP', 'Russian language'],
       architecture: 'User → Streamlit UI → GigaChat API → OAuth 2.0 → Response',
+      completed: true,
     },
     {
       idx: '05',
@@ -78,11 +84,69 @@ export function ProjectsSection({ t }: ProjectsProps) {
       categoryColor: '#27ae60',
       metrics: ['13 DB tables', 'REST + Telegram'],
       architecture: 'Telegram Bot → REST API (Go) → SQLite + JWT Auth',
+      completed: true,
     },
   ]
 
+  const toggle = useCallback((i: number) => {
+    setActive(prev => prev === i ? null : i)
+  }, [])
+
+  // Scroll to expanded card
+  useEffect(() => {
+    if (active !== null && itemRefs.current[active]) {
+      const el = itemRefs.current[active]
+      const rect = el.getBoundingClientRect()
+      const inView = rect.top >= 0 && rect.bottom <= window.innerHeight
+      if (!inView) {
+        setTimeout(() => {
+          el.scrollIntoView({ behavior: 'smooth', block: 'nearest' })
+        }, 50)
+      }
+    }
+  }, [active])
+
+  // Close on outside click
+  useEffect(() => {
+    if (active === null) return
+    const handler = (e: MouseEvent) => {
+      if (sectionRef.current && !sectionRef.current.contains(e.target as Node)) {
+        setActive(null)
+      }
+    }
+    document.addEventListener('mousedown', handler)
+    return () => document.removeEventListener('mousedown', handler)
+  }, [active])
+
+  // Keyboard navigation
+  useEffect(() => {
+    const handler = (e: KeyboardEvent) => {
+      if (!sectionRef.current?.contains(document.activeElement)) return
+      if (e.key === 'Escape') {
+        setActive(null)
+        return
+      }
+      const focused = document.activeElement as HTMLElement
+      const row = focused.closest('.project-row')
+      if (!row) return
+      const items = Array.from(sectionRef.current.querySelectorAll('.project-row'))
+      const idx = items.indexOf(row)
+      if (e.key === 'ArrowDown') {
+        e.preventDefault()
+        const next = items[idx + 1] as HTMLElement | undefined
+        next?.focus()
+      } else if (e.key === 'ArrowUp') {
+        e.preventDefault()
+        const prev = items[idx - 1] as HTMLElement | undefined
+        prev?.focus()
+      }
+    }
+    document.addEventListener('keydown', handler)
+    return () => document.removeEventListener('keydown', handler)
+  }, [])
+
   return (
-    <section className="section" id="projects">
+    <section className="section" id="projects" ref={sectionRef}>
       <div className="container">
         <div className="section-number">
           002
@@ -93,21 +157,27 @@ export function ProjectsSection({ t }: ProjectsProps) {
           {projects.map((p, i) => (
             <div
               key={p.idx}
+              ref={el => { itemRefs.current[i] = el }}
               className={`project-item${active === i ? ' open' : ''}`}
               style={{ '--project-color': p.categoryColor } as React.CSSProperties}
             >
               <div
                 className="project-row"
-                onClick={() => setActive(active === i ? null : i)}
+                onClick={() => toggle(i)}
                 role="button"
                 tabIndex={0}
-                onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') setActive(active === i ? null : i) }}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault()
+                    toggle(i)
+                  }
+                }}
               >
                 <span className="project-idx">{p.idx}</span>
                 <span className="project-name">{p.name}</span>
                 <span className="project-category" style={{ color: p.categoryColor, borderColor: p.categoryColor + '40', background: p.categoryColor + '10' }}>{p.category}</span>
-                <span className="project-desc">{p.desc}</span>
-                <span className="project-status">{p.status}</span>
+                <span className="project-status-text">{p.status}</span>
+                <span className={`project-status-dot${p.completed ? ' done' : ''}`} />
                 <span className="project-chevron">
                   <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2">
                     <polyline points="6 9 12 15 18 9" />
