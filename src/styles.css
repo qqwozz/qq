@@ -986,17 +986,20 @@ body::before {
     border-radius: var(--radius-lg);
     overflow: hidden;
     border: 1px solid var(--glass-border);
+    border-left: 2px solid transparent;
     background: var(--glass-bg);
     transition: all var(--duration-normal) var(--ease-out);
 }
 
 .project-item:hover {
     border-color: var(--glass-border-hover);
+    border-left-color: rgba(26, 58, 92, 0.3);
 }
 
 .project-item.open {
     border-color: var(--glass-border-hover);
-    box-shadow: var(--shadow-md);
+    border-left-color: var(--accent);
+    box-shadow: var(--shadow-md), -4px 0 20px rgba(26, 58, 92, 0.08);
 }
 
 .project-row {
@@ -1067,7 +1070,7 @@ body::before {
 
 .project-chevron {
     color: var(--text-muted);
-    transition: transform var(--duration-normal) var(--ease-out);
+    transition: all var(--duration-normal) var(--ease-out);
     position: relative;
     z-index: 1;
     display: flex;
@@ -1077,12 +1080,21 @@ body::before {
 .project-item.open .project-chevron {
     transform: rotate(180deg);
     color: var(--accent);
+    animation: chevronPulse 2s ease-in-out infinite;
+}
+
+@keyframes chevronPulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.6; }
 }
 
 .project-detail {
     padding: 0 var(--space-lg) var(--space-lg);
     position: relative;
-    animation: detailFadeIn 0.25s var(--ease-out);
+    border-top: 1px solid var(--border);
+    margin: 0 var(--space-lg);
+    padding-top: var(--space-lg);
+    animation: detailFadeIn 0.3s var(--ease-out);
 }
 
 @keyframes detailFadeIn {
@@ -1116,9 +1128,9 @@ body::before {
     list-style: none;
     padding: 0;
     margin: 0;
-    display: flex;
-    flex-direction: column;
-    gap: 6px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px 24px;
 }
 
 .project-detail-features li {
@@ -1127,6 +1139,18 @@ body::before {
     line-height: 1.5;
     padding-left: var(--space-lg);
     position: relative;
+    opacity: 0;
+    animation: featureFadeIn 0.3s var(--ease-out) forwards;
+}
+
+.project-detail-features li:nth-child(1) { animation-delay: 0.05s; }
+.project-detail-features li:nth-child(2) { animation-delay: 0.1s; }
+.project-detail-features li:nth-child(3) { animation-delay: 0.15s; }
+.project-detail-features li:nth-child(4) { animation-delay: 0.2s; }
+
+@keyframes featureFadeIn {
+    from { opacity: 0; transform: translateX(-8px); }
+    to { opacity: 1; transform: translateX(0); }
 }
 
 .project-detail-features li::before {
@@ -1145,6 +1169,13 @@ body::before {
     display: flex;
     gap: 6px;
     flex-wrap: wrap;
+    opacity: 0;
+    animation: techFadeIn 0.3s var(--ease-out) 0.25s forwards;
+}
+
+@keyframes techFadeIn {
+    from { opacity: 0; transform: translateY(4px); }
+    to { opacity: 1; transform: translateY(0); }
 }
 
 .project-tech-tag {
@@ -1156,6 +1187,14 @@ body::before {
     background: rgba(255, 255, 255, 0.02);
     font-family: 'JetBrains Mono', 'Fira Code', monospace;
     letter-spacing: 0.3px;
+    transition: all var(--duration-normal) var(--ease-out);
+}
+
+.project-tech-tag:hover {
+    border-color: rgba(26, 58, 92, 0.4);
+    color: var(--accent);
+    background: rgba(26, 58, 92, 0.08);
+    transform: scale(1.05);
 }
 
 .project-detail-link {
@@ -1163,8 +1202,8 @@ body::before {
     align-items: center;
     gap: var(--space-sm);
     margin-left: calc(40px + var(--space-md));
-    margin-top: var(--space-sm);
-    padding: 8px 16px;
+    margin-top: var(--space-md);
+    padding: 10px 20px;
     font-size: 13px;
     color: var(--text-secondary);
     text-decoration: none;
@@ -1172,12 +1211,21 @@ body::before {
     border-radius: var(--radius-full);
     transition: all var(--duration-normal) var(--ease-out);
     font-weight: 500;
+    opacity: 0;
+    animation: linkFadeIn 0.3s var(--ease-out) 0.3s forwards;
+}
+
+@keyframes linkFadeIn {
+    from { opacity: 0; transform: translateY(4px); }
+    to { opacity: 1; transform: translateY(0); }
 }
 
 .project-detail-link:hover {
-    color: var(--accent);
-    border-color: rgba(26, 58, 92, 0.3);
-    background: rgba(26, 58, 92, 0.06);
+    color: white;
+    border-color: var(--accent);
+    background: var(--accent);
+    box-shadow: 0 0 16px rgba(26, 58, 92, 0.3);
+    transform: translateY(-1px);
 }
 
 /* ========== SKILLS ========== */
@@ -1570,6 +1618,8 @@ a, button, .project-row, .contact-link, .skill-cell, .feature-cell, .stat-cell, 
         padding-left: 0;
         margin-left: 0;
     }
+    .project-detail { margin: 0; }
+    .project-detail-features { grid-template-columns: 1fr; }
 
     .skills-row, .skills-row-2 { grid-template-columns: 1fr 1fr; margin-top: 2px; }
     .skill-cell { padding: var(--space-lg) var(--space-md); }
