@@ -870,6 +870,10 @@ body::before {
     transition: all var(--duration-normal) var(--ease-out);
 }
 
+.experience-card-new:last-child .experience-card-logo img {
+    margin-left: 20px;
+}
+
 .experience-card-new:hover .experience-card-logo img {
     opacity: 1;
     transform: scale(1.05);
