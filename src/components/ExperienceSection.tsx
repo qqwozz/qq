@@ -18,7 +18,6 @@ export function ExperienceSection({ t }: ExperienceProps) {
           <div className="experience-card-new">
             <div className="experience-card-content">
               <div className="experience-card-header">
-                <span className="experience-period">2024 — н.в.</span>
                 <span className="experience-type">{t('experience.yandex.type')}</span>
               </div>
               <h3 className="experience-card-title">Яндекс</h3>
@@ -45,7 +44,6 @@ export function ExperienceSection({ t }: ExperienceProps) {
           <div className="experience-card-new">
             <div className="experience-card-content">
               <div className="experience-card-header">
-                <span className="experience-period">2023 — 2024</span>
                 <span className="experience-type">{t('experience.vtb.type')}</span>
               </div>
               <h3 className="experience-card-title">ВТБ</h3>
