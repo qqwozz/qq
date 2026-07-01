@@ -9,8 +9,8 @@ interface HeroProps {
 export function HeroSection({ heroTitleRef, heroSubRef, scrollIndicatorRef }: HeroProps) {
   return (
     <section className="hero" id="hero">
-      <div className="hero-glow" />
-      <div className="hero-particles">
+      <div className="hero-glow" aria-hidden="true" />
+      <div className="hero-particles" aria-hidden="true">
         <div className="hero-particle" />
         <div className="hero-particle" />
         <div className="hero-particle" />
@@ -25,7 +25,7 @@ export function HeroSection({ heroTitleRef, heroSubRef, scrollIndicatorRef }: He
         <p className="hero-subtitle" ref={heroSubRef}></p>
       </div>
       <div className="scroll-indicator" ref={scrollIndicatorRef}>
-        <div className="scroll-line" />
+        <div className="scroll-line" aria-hidden="true" />
       </div>
     </section>
   )

@@ -18,10 +18,10 @@ export class ErrorBoundary extends Component<Props, State> {
   render() {
     if (this.state.hasError) {
       return (
-        <div style={{ padding: '2rem', textAlign: 'center', color: '#a0a0a0', background: '#0a0a0a', minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', flexDirection: 'column', gap: '1rem' }}>
-          <h1 style={{ color: '#fff', fontSize: '1.5rem' }}>Something went wrong</h1>
+        <div style={{ padding: '2rem', textAlign: 'center', color: '#8b949e', background: '#080b12', minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', flexDirection: 'column', gap: '1rem' }}>
+          <h1 style={{ color: '#e6edf3', fontSize: '1.5rem' }}>Something went wrong</h1>
           <p>Please refresh the page.</p>
-          <button onClick={() => window.location.reload()} style={{ padding: '0.5rem 1.5rem', background: '#fff', color: '#0a0a0a', border: 'none', borderRadius: '8px', cursor: 'pointer', fontSize: '1rem' }}>
+          <button onClick={() => window.location.reload()} style={{ padding: '0.5rem 1.5rem', background: '#58a6ff', color: '#080b12', border: 'none', borderRadius: '8px', cursor: 'pointer', fontSize: '1rem', fontWeight: 600 }}>
             Reload
           </button>
         </div>

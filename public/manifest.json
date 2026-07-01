@@ -3,8 +3,8 @@
   "short_name": "qqwozz",
   "start_url": "/qq/",
   "display": "standalone",
-  "background_color": "#0a0a0a",
-  "theme_color": "#0a0a0a",
+  "background_color": "#080b12",
+  "theme_color": "#080b12",
   "icons": [
     {
       "src": "/qq/favicon.svg",

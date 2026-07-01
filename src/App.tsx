@@ -29,9 +29,15 @@ function App() {
 
   const sectionsRef = useRef<HTMLElement[]>([])
   const navLinksRef = useRef<HTMLElement[]>([])
+  const heroGlowRef = useRef<HTMLElement | null>(null)
+  const heroParticlesRef = useRef<HTMLElement | null>(null)
+  const progressBarsRef = useRef<HTMLElement[]>([])
 
+  const rafId = useRef(0)
   const handleScroll = useCallback(() => {
-    const scrollTop = window.scrollY
+    cancelAnimationFrame(rafId.current)
+    rafId.current = requestAnimationFrame(() => {
+      const scrollTop = window.scrollY
     const docHeight = document.documentElement.scrollHeight - window.innerHeight
     const progress = docHeight > 0 ? scrollTop / docHeight : 0
 
@@ -54,9 +60,11 @@ function App() {
     if (!sectionsRef.current.length) {
       sectionsRef.current = Array.from(document.querySelectorAll<HTMLElement>('section[id]'))
       navLinksRef.current = Array.from(document.querySelectorAll<HTMLElement>('.nav-link'))
+      progressBarsRef.current = Array.from(document.querySelectorAll<HTMLElement>('.section-number-progress'))
     }
 
     let current = ''
+    const heroHeight = window.innerHeight
     for (const s of sectionsRef.current) {
       if (scrollTop >= s.offsetTop - 200) {
         current = s.id
@@ -64,6 +72,25 @@ function App() {
     }
     navLinksRef.current.forEach((link) => {
       link.classList.toggle('active', link.getAttribute('href') === '#' + current)
+    })
+
+    for (let i = 0; i < sectionsRef.current.length; i++) {
+      const rect = sectionsRef.current[i].getBoundingClientRect()
+      const p = Math.max(0, Math.min(1, (heroHeight - rect.top) / (heroHeight + rect.height)))
+      if (progressBarsRef.current[i]) {
+        progressBarsRef.current[i].style.width = `${p * 100}%`
+      }
+    }
+
+    if (heroGlowRef.current && scrollTop <= heroHeight) {
+      const p = scrollTop / heroHeight
+      heroGlowRef.current.style.transform = `translate(-50%, calc(-50% + ${p * 100}px))`
+    }
+    if (heroParticlesRef.current && scrollTop <= heroHeight) {
+      const p = scrollTop / heroHeight
+      heroParticlesRef.current.style.transform = `translateY(${p * 50}px)`
+      heroParticlesRef.current.style.opacity = String(1 - p * 0.8)
+    }
     })
   }, [])
 
@@ -73,6 +100,11 @@ function App() {
   }, [handleScroll])
 
   useEffect(() => {
+    if (mobileMenuOpen) {
+      document.body.classList.add('menu-open')
+    } else {
+      document.body.classList.remove('menu-open')
+    }
     if (!mobileMenuOpen) return
     const handleKey = (e: KeyboardEvent) => {
       if (e.key === 'Escape') setMobileMenuOpen(false)
@@ -97,18 +129,26 @@ function App() {
   }, [])
 
   useEffect(() => {
+    let lenis: import('lenis').default | null = null
+    let rafId: number
+
     import('lenis').then(({ default: Lenis }) => {
-      const lenis = new Lenis({
+      lenis = new Lenis({
         duration: 1.0,
         easing: (t: number) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
         smoothWheel: true
       })
       const raf = (time: number) => {
-        lenis.raf(time)
-        requestAnimationFrame(raf)
+        lenis!.raf(time)
+        rafId = requestAnimationFrame(raf)
       }
-      requestAnimationFrame(raf)
+      rafId = requestAnimationFrame(raf)
     }).catch(() => {})
+
+    return () => {
+      cancelAnimationFrame(rafId)
+      lenis?.destroy()
+    }
   }, [])
 
   useEffect(() => {
@@ -206,114 +246,80 @@ function App() {
 
   useEffect(() => {
     if (!ready) return
-    const cards = document.querySelectorAll<HTMLElement>('.stat-cell, .feature-cell, .skill-cell, .experience-card, .project-row')
+    const selectors = '.stat-cell, .feature-cell, .skill-cell, .experience-card'
     const cleanup: (() => void)[] = []
 
-    cards.forEach((card) => {
-      const onMove = (e: MouseEvent) => {
-        const rect = card.getBoundingClientRect()
-        const x = e.clientX - rect.left
-        const y = e.clientY - rect.top
-        card.style.setProperty('--gx', `${x}px`)
-        card.style.setProperty('--gy', `${y}px`)
-      }
-      card.addEventListener('mousemove', onMove)
-      cleanup.push(() => card.removeEventListener('mousemove', onMove))
-    })
-
-    return () => cleanup.forEach((fn) => fn())
-  }, [ready])
-
-  useEffect(() => {
-    if (!ready) return
-    const cards = document.querySelectorAll<HTMLElement>('.stat-cell, .feature-cell, .skill-cell, .experience-card')
-    const cleanup: (() => void)[] = []
-
-    cards.forEach((card) => {
-      const onMove = (e: MouseEvent) => {
-        const rect = card.getBoundingClientRect()
-        const x = (e.clientX - rect.left) / rect.width - 0.5
-        const y = (e.clientY - rect.top) / rect.height - 0.5
-        card.style.transform = `perspective(600px) rotateY(${x * 8}deg) rotateX(${-y * 8}deg) translateY(-2px)`
-      }
-      const onLeave = () => { card.style.transform = '' }
-      card.addEventListener('mousemove', onMove)
-      card.addEventListener('mouseleave', onLeave)
-      cleanup.push(() => { card.removeEventListener('mousemove', onMove); card.removeEventListener('mouseleave', onLeave) })
-    })
-
-    return () => cleanup.forEach((fn) => fn())
-  }, [ready])
-
-  useEffect(() => {
-    if (!ready) return
-    const links = document.querySelectorAll<HTMLElement>('.contact-link')
-    const cleanup: (() => void)[] = []
-
-    links.forEach((link) => {
-      const onMove = (e: MouseEvent) => {
-        const rect = link.getBoundingClientRect()
-        const cx = rect.left + rect.width / 2
-        const cy = rect.top + rect.height / 2
-        const dx = e.clientX - cx
-        const dy = e.clientY - cy
-        const dist = Math.sqrt(dx * dx + dy * dy)
-        const maxDist = 200
-
-        if (dist < maxDist) {
-          const force = (1 - dist / maxDist) * 12
-          link.style.transform = `translate(${dx * force / maxDist}px, ${dy * force / maxDist}px)`
-        }
-      }
-      const onLeave = () => { link.style.transform = '' }
-      link.addEventListener('mousemove', onMove)
-      link.addEventListener('mouseleave', onLeave)
-      cleanup.push(() => { link.removeEventListener('mousemove', onMove); link.removeEventListener('mouseleave', onLeave) })
-    })
-
-    return () => cleanup.forEach((fn) => fn())
-  }, [ready])
-
-  useEffect(() => {
-    if (!ready) return
-    const heroGlow = document.querySelector('.hero-glow') as HTMLElement
-    const heroParticles = document.querySelector('.hero-particles') as HTMLElement
-    if (!heroGlow || !heroParticles) return
-
-    const onScroll = () => {
-      const scrollY = window.scrollY
-      const heroHeight = window.innerHeight
-      if (scrollY > heroHeight) return
-
-      const progress = scrollY / heroHeight
-      heroGlow.style.transform = `translate(-50%, calc(-50% + ${progress * 100}px))`
-      heroParticles.style.transform = `translateY(${progress * 50}px)`
-      heroParticles.style.opacity = String(1 - progress * 0.8)
+    const onMove = (e: MouseEvent) => {
+      const card = (e.target as HTMLElement).closest<HTMLElement>(selectors)
+      if (!card) return
+      const rect = card.getBoundingClientRect()
+      const x = e.clientX - rect.left
+      const y = e.clientY - rect.top
+      card.style.setProperty('--gx', `${x}px`)
+      card.style.setProperty('--gy', `${y}px`)
+      const rx = (x / rect.width - 0.5) * 8
+      const ry = (y / rect.height - 0.5) * -8
+      card.style.transform = `perspective(600px) rotateY(${rx}deg) rotateX(${ry}deg) translateY(-2px)`
     }
 
-    window.addEventListener('scroll', onScroll, { passive: true })
-    return () => window.removeEventListener('scroll', onScroll)
+    const onLeave = (e: MouseEvent) => {
+      const card = (e.target as HTMLElement).closest<HTMLElement>(selectors)
+      if (card) card.style.transform = ''
+    }
+
+    document.addEventListener('mousemove', onMove)
+    document.addEventListener('mouseleave', onLeave, true)
+    cleanup.push(
+      () => document.removeEventListener('mousemove', onMove),
+      () => document.removeEventListener('mouseleave', onLeave, true)
+    )
+
+    return () => cleanup.forEach((fn) => fn())
   }, [ready])
 
   useEffect(() => {
     if (!ready) return
-    const sections = document.querySelectorAll<HTMLElement>('section[id]')
-    const progressBars = document.querySelectorAll<HTMLElement>('.section-number-progress')
+    const cleanup: (() => void)[] = []
 
-    const onScroll = () => {
-      sections.forEach((section, i) => {
-        const rect = section.getBoundingClientRect()
-        const windowHeight = window.innerHeight
-        const progress = Math.max(0, Math.min(1, (windowHeight - rect.top) / (windowHeight + rect.height)))
-        if (progressBars[i]) {
-          (progressBars[i] as HTMLElement).style.width = `${progress * 100}%`
-        }
-      })
+    const onMove = (e: MouseEvent) => {
+      const link = (e.target as HTMLElement).closest<HTMLElement>('.contact-link')
+      if (!link) return
+      const rect = link.getBoundingClientRect()
+      const cx = rect.left + rect.width / 2
+      const cy = rect.top + rect.height / 2
+      const dx = e.clientX - cx
+      const dy = e.clientY - cy
+      const dist = Math.sqrt(dx * dx + dy * dy)
+      const maxDist = 200
+      if (dist < maxDist) {
+        const force = (1 - dist / maxDist) * 12
+        link.style.transform = `translate(${dx * force / maxDist}px, ${dy * force / maxDist}px)`
+      }
+    }
+    const onLeave = (e: MouseEvent) => {
+      const link = (e.target as HTMLElement).closest<HTMLElement>('.contact-link')
+      if (link) link.style.transform = ''
     }
 
-    window.addEventListener('scroll', onScroll, { passive: true })
-    onScroll()
-    return () => window.removeEventListener('scroll', onScroll)
+    document.addEventListener('mousemove', onMove)
+    document.addEventListener('mouseleave', onLeave, true)
+    cleanup.push(
+      () => document.removeEventListener('mousemove', onMove),
+      () => document.removeEventListener('mouseleave', onLeave, true)
+    )
+
+    return () => cleanup.forEach((fn) => fn())
+  }, [ready])
+
+  useEffect(() => {
+    if (!ready) return
+    heroGlowRef.current = document.querySelector('.hero-glow')
+    heroParticlesRef.current = document.querySelector('.hero-particles')
+  }, [ready])
+
+  useEffect(() => {
+    if (!ready) return
+    progressBarsRef.current = Array.from(document.querySelectorAll<HTMLElement>('.section-number-progress'))
   }, [ready])
 
   useEffect(() => {
@@ -366,15 +372,15 @@ function App() {
         <div className={`loading-screen${loadingFade ? ' fade-out' : ''}`}>
           <div className="loading-brand">
             <div className="loading-logo">qqwozz</div>
-            <div className="loading-bar">
+            <div className="loading-bar" aria-hidden="true">
               <div className="loading-bar-fill" />
             </div>
           </div>
         </div>
       )}
 
-      <div className="noise-overlay" />
-      <div className="progress-bar" ref={progressRef} />
+      <div className="noise-overlay" aria-hidden="true" />
+      <div className="progress-bar" ref={progressRef} aria-hidden="true" />
 
       <Navbar
         t={t}
@@ -392,7 +398,7 @@ function App() {
         scrollIndicatorRef={scrollIndicatorRef}
       />
 
-      <div className="divider" />
+      <div className="divider" aria-hidden="true" />
 
       <AboutSection t={t} stats={stats} />
 
@@ -400,15 +406,15 @@ function App() {
 
       <ExperienceSection t={t} />
 
-      <div className="divider" />
+      <div className="divider" aria-hidden="true" />
 
       <ProjectsSection t={t} />
 
-      <div className="divider" />
+      <div className="divider" aria-hidden="true" />
 
       <StackSection t={t} />
 
-      <div className="divider" />
+      <div className="divider" aria-hidden="true" />
 
       <ContactSection t={t} />
 
