@@ -511,6 +511,7 @@ body::before {
     background: none;
     border: none;
     outline: none;
+    box-shadow: none;
     color: #c0caf5;
     font-family: inherit;
     font-size: inherit;
@@ -521,6 +522,12 @@ body::before {
 
 .terminal-input::placeholder {
     color: transparent;
+}
+
+.terminal-input:focus {
+    outline: none;
+    box-shadow: none;
+    border: none;
 }
 
 /* ========== SECTION TITLES ========== */
