@@ -7,7 +7,6 @@ import { AboutSection } from './components/AboutSection'
 import { MarqueeSection } from './components/MarqueeSection'
 
 import { ProjectsSection } from './components/ProjectsSection'
-import { CodeSection } from './components/CodeSection'
 import { ExperienceSection } from './components/ExperienceSection'
 import { StackSection } from './components/StackSection'
 import { TerminalSection } from './components/TerminalSection'
@@ -421,10 +420,6 @@ function App() {
       <div className="divider" aria-hidden="true" />
 
       <ProjectsSection t={t} />
-
-      <div className="divider" aria-hidden="true" />
-
-      <CodeSection t={t} />
 
       <div className="divider" aria-hidden="true" />
 
