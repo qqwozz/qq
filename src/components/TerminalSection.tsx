@@ -77,7 +77,11 @@ const COMMANDS: Record<string, () => string[]> = {
 type Line = { type: 'prompt'; cmd: string } | { type: 'output'; text: string }
 
 export function TerminalSection({ t }: TerminalProps) {
-  const [lines, setLines] = useState<Line[]>([])
+  const [lines, setLines] = useState<Line[]>([
+    { type: 'output', text: 'добро пожаловать в qqwozz-term v2.0' },
+    { type: 'output', text: 'введите "help" для списка команд' },
+    { type: 'output', text: '' },
+  ])
   const [input, setInput] = useState('')
   const [history, setHistory] = useState<string[]>([])
   const [historyIdx, setHistoryIdx] = useState(-1)
@@ -161,14 +165,14 @@ export function TerminalSection({ t }: TerminalProps) {
             {lines.map((line, i) => (
               <div key={i} className="terminal-line">
                 {line.type === 'prompt' ? (
-                  <><span className="terminal-prompt">➜  comp </span><span className="terminal-cmd">{line.cmd}</span></>
+                  <><span className="terminal-prompt">➜  comp  </span><span className="terminal-cmd">{line.cmd}</span></>
                 ) : (
                   <span className="terminal-output">{line.text}</span>
                 )}
               </div>
             ))}
             <div className="terminal-input-line">
-              <span className="terminal-prompt">➜  comp </span>
+              <span className="terminal-prompt">➜  comp  </span>
               <input
                 ref={inputRef}
                 className="terminal-input"
