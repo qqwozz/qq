@@ -129,6 +129,9 @@ function App() {
   }, [])
 
   useEffect(() => {
+    const isTouch = 'ontouchstart' in window || navigator.maxTouchPoints > 0
+    if (isTouch) return
+
     let lenis: import('lenis').default | null = null
     let rafId: number
 
@@ -246,6 +249,9 @@ function App() {
 
   useEffect(() => {
     if (!ready) return
+    const isTouch = 'ontouchstart' in window || navigator.maxTouchPoints > 0
+    if (isTouch) return
+
     const selectors = '.stat-cell, .feature-cell, .skill-cell, .experience-card'
     const cleanup: (() => void)[] = []
 
@@ -279,6 +285,9 @@ function App() {
 
   useEffect(() => {
     if (!ready) return
+    const isTouch = 'ontouchstart' in window || navigator.maxTouchPoints > 0
+    if (isTouch) return
+
     const cleanup: (() => void)[] = []
 
     const onMove = (e: MouseEvent) => {
