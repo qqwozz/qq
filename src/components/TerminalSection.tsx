@@ -5,9 +5,44 @@ interface TerminalProps {
   t: (key: TranslationKey) => string
 }
 
+const KALI_ART = [
+  "            ..............",
+  "                ..,;:ccc,.",
+  "              ......''',;lxo.",
+  "            ....''',..........,:ld;",
+  "              .,;j;i;:;,...,x,",
+  "            ..''.          0Xxoc:,.  ...",
+  "          ....            ,ONkc,;,cokOd;'.",
+  "        .                   OMo            ':ddo.",
+  "                            dMc                :OO;",
+  "                            0M.                  .:o.",
+  "                            ;Wd",
+  "                            ;XO,",
+  "                              ,d00dlc;,...",
+  "                                ..',;;cdO0d:,.",
+  "                                      .:d;.':.",
+  "                                      'd . '",
+  "                                        ;l ..",
+  "                                         .o",
+  "                                          c",
+  "                                          .'",
+]
+
+const KALI_INFO = [
+  ['OS:', 'Kali GNU/Linux Rolling x86_64'],
+  ['Host:', 'qqwozz portfolio v2.0'],
+  ['Kernel:', 'React 18.3 + Vite 5.4'],
+  ['Uptime:', 'since 2023'],
+  ['Packages:', '5 (python, go, c++, docker, grpc)'],
+  ['Shell:', 'typescript 5.6'],
+  ['Terminal:', 'qqwozz-term'],
+  ['CPU:', 'backend developer @ 100%'],
+  ['Memory:', '∞ / ∞'],
+]
+
 const COMMANDS: Record<string, (t: (k: TranslationKey) => string) => string[]> = {
-  help: (t) => [
-    'доступные команды:',
+  help: () => [
+    ' доступные команды:',
     '',
     '  help       — показать эту справку',
     '  whoami     — кто я',
@@ -15,79 +50,82 @@ const COMMANDS: Record<string, (t: (k: TranslationKey) => string) => string[]> =
     '  projects   — мои проекты',
     '  stack      — стек технологий',
     '  contact    — как связаться',
-    '  neofetch   — системная инфа',
+    '  fastfetch  — системная инфа',
+    '  ls         — список файлов',
+    '  sudo       — ???',
     '  clear      — очистить терминал',
   ],
   whoami: () => [
-    'дима киселев (qqwozz)',
-    'backend-разработчик',
-    'python · go · c++',
+    ' qqwozz',
   ],
-  about: (t) => [
-    'я backend-разработчик, работаю с python, go и c++.',
-    'создаю микросервисы, api и high-load системы.',
-    'мой подход — чистая архитектура, производительность и надёжность.',
-    '',
-    'mtuci — moscow technical university of communications and informatics.',
+  about: () => [
+    ' backend-разработчик, python · go · c++',
+    ' создаю микросервисы, api и high-load системы',
+    ' mtuci — moscow technical university',
   ],
   projects: () => [
-    '  01  qw trading platform  — крипто-биржа с c++ matching engine',
-    '  02  qw_pay               — микросервис платежей',
-    '  03  enf-shop             — интернет-магазин одежды',
-    '  04  ai-chat-bot          — nlp чат-бот на ии',
-    '  05  autoadmin            — api + telegram-бот для записей',
+    ' qw trading platform   c++, go, grpc',
+    ' qw_pay                go, c++, python',
+    ' enf-shop              django, htmx, docker',
+    ' ai-chat-bot           python, nlp',
+    ' autoadmin             go, sqlite, telegram',
   ],
   stack: () => [
-    '  backend:   python, go, c++, fastapi, django, grpc',
-    '  databases: postgresql, mysql, redis, sqlite',
-    '  infra:     docker, linux, nginx, gunicorn',
-    '  tools:     git, github actions, postman, vs code',
+    ' python  go  c++  fastapi  django  grpc',
+    ' postgresql  mysql  redis  sqlite',
+    ' docker  linux  nginx  gunicorn',
+    ' git  github actions  postman  vs code',
   ],
   contact: () => [
-    '  telegram:  t.me/qqqwozz',
-    '  github:    github.com/qqwozz',
-    '  email:     offconix@gmail.com',
-    '  leetcode:  leetcode.com/u/oonixxxxx',
-    '  instagram: instagram.com/qqqwozz',
+    ' telegram  t.me/qqqwozz',
+    ' github    github.com/qqwozz',
+    ' email     offconix@gmail.com',
   ],
-  neofetch: () => [
-    '       qqwozz@portfolio',
-    '       ─────────────────',
-    '  os:    ubuntu 24.04',
-    '  host:  qqwozz portfolio v2.0',
-    '  kernel: react 18.3 + vite 5.4',
-    '  shell:  typescript 5.6',
-    '  wm:     glass-morphism',
-    '  theme:  black / white / dark blue',
-    '  memory: 64mb / ∞',
-    '',
-    '  ████████████████████  100%',
+  ls: () => [
+    ' about.md  projects/  stack/  contact/  README.md',
   ],
+  sudo: () => [
+    ' [sudo] password for qqwozz: ********',
+    ' qqwozz is not in the sudoers file. This incident will be reported.',
+  ],
+  fastfetch: () => {
+    const lines: string[] = []
+    const maxLeft = Math.max(...KALI_ART.map(l => l.length))
+    const totalLines = Math.max(KALI_ART.length, KALI_INFO.length)
+    for (let i = 0; i < totalLines; i++) {
+      const left = (KALI_ART[i] || '').padEnd(maxLeft + 2)
+      const info = KALI_INFO[i]
+      if (info) {
+        lines.push(`\x1b[1m${info[0]}\x1b[0m ${info[1]}`)
+      } else {
+        lines.push(left)
+      }
+    }
+    return lines
+  },
   clear: () => [],
 }
 
 export function TerminalSection({ t }: TerminalProps) {
-  const [lines, setLines] = useState<string[]>([
-    'портфолио-терминал v2.0',
-    'введите "help" для списка команд',
-    '',
-  ])
+  const [lines, setLines] = useState<string[]>([''])
   const [input, setInput] = useState('')
   const [history, setHistory] = useState<string[]>([])
   const [historyIdx, setHistoryIdx] = useState(-1)
   const endRef = useRef<HTMLDivElement>(null)
   const inputRef = useRef<HTMLInputElement>(null)
+  const bodyRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
-    endRef.current?.scrollIntoView({ behavior: 'smooth' })
+    if (bodyRef.current) {
+      bodyRef.current.scrollTop = bodyRef.current.scrollHeight
+    }
   }, [lines])
 
   const exec = (cmd: string) => {
     const trimmed = cmd.trim().toLowerCase()
-    const prompt = `$ ${cmd}`
 
     if (!trimmed) {
-      setLines(prev => [...prev, prompt])
+      setLines(prev => [...prev, `➜  comp ${cmd}`])
       return
     }
 
@@ -97,9 +135,18 @@ export function TerminalSection({ t }: TerminalProps) {
     }
 
     const handler = COMMANDS[trimmed]
-    const output = handler ? handler(t) : [`команда не найдена: ${trimmed}`, 'введите "help" для списка команд']
+    const prompt = `➜  comp ${cmd}`
 
-    setLines(prev => [...prev, prompt, ...output, ''])
+    if (trimmed === 'fastfetch') {
+      const output = handler(t)
+      setLines(prev => [...prev, prompt, ...output, ''])
+    } else if (handler) {
+      const output = handler(t)
+      setLines(prev => [...prev, prompt, ...output, ''])
+    } else {
+      setLines(prev => [...prev, prompt, `zsh: command not found: ${trimmed}`, ''])
+    }
+
     setHistory(prev => [trimmed, ...prev])
     setHistoryIdx(-1)
   }
@@ -129,32 +176,37 @@ export function TerminalSection({ t }: TerminalProps) {
   }
 
   return (
-    <section className="section" id="terminal" onClick={() => inputRef.current?.focus()}>
+    <section className="section" id="terminal">
       <div className="container">
         <div className="section-number">
           004
           <div className="section-number-progress" />
         </div>
         <h2 className="section-title anim">терминал</h2>
-        <div className="terminal anim">
+        <div className="terminal anim" onClick={() => inputRef.current?.focus()}>
           <div className="terminal-header">
             <span className="terminal-dot red" />
             <span className="terminal-dot yellow" />
             <span className="terminal-dot green" />
-            <span className="terminal-title">qqwozz@portfolio ~ $</span>
+            <span className="terminal-title">qqwozz@portfolio</span>
           </div>
-          <div className="terminal-body">
+          <div className="terminal-body" ref={bodyRef}>
             {lines.map((line, i) => (
               <div key={i} className="terminal-line">
-                {line.startsWith('$ ') ? (
-                  <><span className="terminal-prompt">$ </span>{line.slice(2)}</>
+                {line.startsWith('➜  comp ') ? (
+                  <><span className="terminal-prompt">➜  comp </span><span className="terminal-cmd">{line.slice(9)}</span></>
+                ) : line.startsWith('OS:') || line.startsWith('Host:') || line.startsWith('Kernel:') || line.startsWith('Uptime:') || line.startsWith('Packages:') || line.startsWith('Shell:') || line.startsWith('Terminal:') || line.startsWith('CPU:') || line.startsWith('Memory:') ? (
+                  <span className="terminal-info-line">
+                    <span className="terminal-info-key">{line.split(' ')[0]}</span>
+                    <span className="terminal-info-val">{line.slice(line.indexOf(' ') + 1)}</span>
+                  </span>
                 ) : (
                   <span className="terminal-output">{line}</span>
                 )}
               </div>
             ))}
             <div className="terminal-input-line">
-              <span className="terminal-prompt">$ </span>
+              <span className="terminal-prompt">➜  comp </span>
               <input
                 ref={inputRef}
                 className="terminal-input"
@@ -164,6 +216,7 @@ export function TerminalSection({ t }: TerminalProps) {
                 spellCheck={false}
                 autoComplete="off"
                 autoFocus
+                placeholder="введите команду..."
               />
             </div>
             <div ref={endRef} />
