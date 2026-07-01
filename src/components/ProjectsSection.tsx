@@ -24,7 +24,7 @@ export function ProjectsSection({ t }: ProjectsProps) {
       categoryColor: '#1a6bff',
       metrics: ['1000+ orders/sec', '6 microservices'],
       architecture: 'Client → API Gateway → Order Service → Matching Engine (C++) → PostgreSQL',
-      completed: true,
+      completed: false,
     },
     {
       idx: '02',
@@ -39,7 +39,7 @@ export function ProjectsSection({ t }: ProjectsProps) {
       categoryColor: '#1a6bff',
       metrics: ['200+ currencies', 'anti-fraud <1ms'],
       architecture: 'API Gateway → Transaction Service → PostgreSQL + Anti-Fraud (C++ + Python)',
-      completed: true,
+      completed: false,
     },
     {
       idx: '03',
@@ -54,7 +54,7 @@ export function ProjectsSection({ t }: ProjectsProps) {
       categoryColor: '#e67e22',
       metrics: ['Stripe integration', 'Docker production'],
       architecture: 'Nginx → Gunicorn → Django → PostgreSQL + Redis + Stripe',
-      completed: true,
+      completed: false,
     },
     {
       idx: '04',
@@ -69,7 +69,7 @@ export function ProjectsSection({ t }: ProjectsProps) {
       categoryColor: '#9b59b6',
       metrics: ['GigaChat NLP', 'Russian language'],
       architecture: 'User → Streamlit UI → GigaChat API → OAuth 2.0 → Response',
-      completed: true,
+      completed: false,
     },
     {
       idx: '05',
@@ -84,7 +84,7 @@ export function ProjectsSection({ t }: ProjectsProps) {
       categoryColor: '#27ae60',
       metrics: ['13 DB tables', 'REST + Telegram'],
       architecture: 'Telegram Bot → REST API (Go) → SQLite + JWT Auth',
-      completed: true,
+      completed: false,
     },
   ]
 
@@ -177,7 +177,8 @@ export function ProjectsSection({ t }: ProjectsProps) {
                 <span className="project-name">{p.name}</span>
                 <span className="project-category" style={{ color: p.categoryColor, borderColor: p.categoryColor + '40', background: p.categoryColor + '10' }}>{p.category}</span>
                 <span className="project-status-text">{p.status}</span>
-                <span className={`project-status-dot${p.completed ? ' done' : ''}`} />
+                <span className={`project-status-dot${p.completed ? ' done' : ' inactive'}`} />
+                <span className="project-status-label">{p.completed ? 'active' : 'inactive'}</span>
                 <span className="project-chevron">
                   <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2">
                     <polyline points="6 9 12 15 18 9" />

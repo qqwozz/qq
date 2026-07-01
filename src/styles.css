@@ -1207,7 +1207,7 @@ body::before {
     width: 6px;
     height: 6px;
     border-radius: 50%;
-    background: #f39c12;
+    background: #e74c3c;
     position: relative;
     z-index: 1;
     flex-shrink: 0;
@@ -1215,6 +1215,20 @@ body::before {
 
 .project-status-dot.done {
     background: #27ae60;
+}
+
+.project-status-dot.inactive {
+    background: #e74c3c;
+}
+
+.project-status-label {
+    font-size: 10px;
+    color: var(--text-muted);
+    font-family: 'JetBrains Mono', 'Fira Code', monospace;
+    letter-spacing: 0.5px;
+    position: relative;
+    z-index: 1;
+    white-space: nowrap;
 }
 
 .project-desc {
@@ -1816,6 +1830,7 @@ a, button, .project-row, .contact-link, .skill-cell, .feature-cell, .stat-cell, 
     .project-name { font-size: 14px; }
     .project-status-text { display: none; }
     .project-category { display: none; }
+    .project-status-label { display: none; }
     .project-detail-about,
     .project-detail-section,
     .project-detail-link,
