@@ -14,37 +14,61 @@ export function ExperienceSection({ t }: ExperienceProps) {
         </div>
         <h2 className="section-title anim">{t('experience.title')}</h2>
         <div className="experience-list anim">
-          <div className="experience-card">
-            <div className="experience-header">
-              <div className="experience-role">{t('experience.role')}</div>
-              <div className="experience-company">Яндекс</div>
+
+          <div className="experience-card-new">
+            <div className="experience-card-content">
+              <div className="experience-card-header">
+                <span className="experience-period">2024 — н.в.</span>
+                <span className="experience-type">{t('experience.yandex.type')}</span>
+              </div>
+              <h3 className="experience-card-title">Яндекс</h3>
+              <div className="experience-card-role">{t('experience.role')}</div>
+              <ul className="experience-card-list">
+                <li>{t('experience.yandex.task1')}</li>
+                <li>{t('experience.yandex.task2')}</li>
+                <li>{t('experience.yandex.task3')}</li>
+                <li>{t('experience.yandex.task4')}</li>
+              </ul>
+              <div className="experience-card-tags">
+                <span className="experience-tag">Python</span>
+                <span className="experience-tag">C++</span>
+                <span className="experience-tag">gRPC</span>
+                <span className="experience-tag">Microservices</span>
+                <span className="experience-tag">Linux</span>
+              </div>
             </div>
-            <div className="experience-desc">
-              {t('experience.yandex.desc')}
-            </div>
-            <div className="experience-tags">
-              <span className="experience-tag">Python</span>
-              <span className="experience-tag">C++</span>
-              <span className="experience-tag">microservices</span>
-              <span className="experience-tag">gRPC</span>
+            <div className="experience-card-logo">
+              <img src="/logos/yandex.svg" alt="Яндекс" />
             </div>
           </div>
 
-          <div className="experience-card">
-            <div className="experience-header">
-              <div className="experience-role">{t('experience.role')}</div>
-              <div className="experience-company">VTB</div>
+          <div className="experience-card-new">
+            <div className="experience-card-content">
+              <div className="experience-card-header">
+                <span className="experience-period">2023 — 2024</span>
+                <span className="experience-type">{t('experience.vtb.type')}</span>
+              </div>
+              <h3 className="experience-card-title">ВТБ</h3>
+              <div className="experience-card-role">{t('experience.role')}</div>
+              <ul className="experience-card-list">
+                <li>{t('experience.vtb.task1')}</li>
+                <li>{t('experience.vtb.task2')}</li>
+                <li>{t('experience.vtb.task3')}</li>
+                <li>{t('experience.vtb.task4')}</li>
+              </ul>
+              <div className="experience-card-tags">
+                <span className="experience-tag">Python</span>
+                <span className="experience-tag">Go</span>
+                <span className="experience-tag">PostgreSQL</span>
+                <span className="experience-tag">Docker</span>
+                <span className="experience-tag">REST API</span>
+              </div>
             </div>
-            <div className="experience-desc">
-              {t('experience.vtb.desc')}
-            </div>
-            <div className="experience-tags">
-              <span className="experience-tag">Python</span>
-              <span className="experience-tag">Go</span>
-              <span className="experience-tag">PostgreSQL</span>
-              <span className="experience-tag">Docker</span>
+            <div className="experience-card-logo">
+              <img src="/logos/vtb.svg" alt="ВТБ" />
             </div>
           </div>
+
         </div>
       </div>
     </section>

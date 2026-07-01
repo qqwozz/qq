@@ -17,7 +17,7 @@ export function ProjectsSection({ t }: ProjectsProps) {
     <section className="section" id="projects">
       <div className="container">
         <div className="section-number">
-          003
+          002
           <div className="section-number-progress" />
         </div>
         <h2 className="section-title anim">{t('projects.title')}</h2>

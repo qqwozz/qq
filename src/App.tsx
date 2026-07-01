@@ -5,8 +5,9 @@ import { Navbar } from './components/Navbar'
 import { HeroSection } from './components/HeroSection'
 import { AboutSection } from './components/AboutSection'
 import { MarqueeSection } from './components/MarqueeSection'
-import { ExperienceSection } from './components/ExperienceSection'
+
 import { ProjectsSection } from './components/ProjectsSection'
+import { ExperienceSection } from './components/ExperienceSection'
 import { StackSection } from './components/StackSection'
 import { ContactSection } from './components/ContactSection'
 import { Footer } from './components/Footer'
@@ -252,7 +253,7 @@ function App() {
     const isTouch = 'ontouchstart' in window || navigator.maxTouchPoints > 0
     if (isTouch) return
 
-    const selectors = '.stat-cell, .feature-cell, .skill-cell, .experience-card'
+    const selectors = '.stat-cell, .feature-cell, .skill-cell, .experience-card-new'
     const cleanup: (() => void)[] = []
 
     const onMove = (e: MouseEvent) => {

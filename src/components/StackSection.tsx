@@ -23,7 +23,7 @@ export function StackSection({ t }: StackProps) {
     <section className="section" id="stack">
       <div className="container">
         <div className="section-number">
-          004
+          003
           <div className="section-number-progress" />
         </div>
         <h2 className="section-title anim">{t('stack.title')}</h2>
