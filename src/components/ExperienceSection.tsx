@@ -37,7 +37,7 @@ export function ExperienceSection({ t }: ExperienceProps) {
               </div>
             </div>
             <div className="experience-card-logo">
-              <img src="/logos/yandex.svg" alt="Яндекс" />
+              <img src={`${import.meta.env.BASE_URL}logos/yandex.svg`} alt="Яндекс" />
             </div>
           </div>
 
@@ -63,7 +63,7 @@ export function ExperienceSection({ t }: ExperienceProps) {
               </div>
             </div>
             <div className="experience-card-logo">
-              <img src="/logos/vtb.svg" alt="ВТБ" />
+              <img src={`${import.meta.env.BASE_URL}logos/vtb.svg`} alt="ВТБ" />
             </div>
           </div>
 
