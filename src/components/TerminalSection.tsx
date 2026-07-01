@@ -5,42 +5,28 @@ interface TerminalProps {
   t: (key: TranslationKey) => string
 }
 
-const KALI_ART = [
-  "            ..............",
-  "                ..,;:ccc,.",
-  "              ......''',;lxo.",
-  "            ....''',..........,:ld;",
-  "              .,;j;i;:;,...,x,",
-  "            ..''.          0Xxoc:,.  ...",
-  "          ....            ,ONkc,;,cokOd;'.",
-  "        .                   OMo            ':ddo.",
-  "                            dMc                :OO;",
-  "                            0M.                  .:o.",
-  "                            ;Wd",
-  "                            ;XO,",
-  "                              ,d00dlc;,...",
-  "                                ..',;;cdO0d:,.",
-  "                                      .:d;.':.",
-  "                                      'd . '",
-  "                                        ;l ..",
-  "                                         .o",
-  "                                          c",
-  "                                          .'",
-]
+const FASTFETCH_OUTPUT = `            ..............                  kali@kali
+                ..,;:ccc,.                  --------------------
+              ......''';lxO.                OS: Kali GNU/Linux Rolling x86_64
+.....''''..........,:ld;                    Host: qqwozz portfolio v2.0
+           .';;;:::;,,.x,                   Kernel: React 18.3 + Vite 5.4
+      ..'''.            0Xxoc:,.  ...       Uptime: since 2023
+  ....                ,ONkc;,;cokOdc',.     Packages: 5 (python, go, c++, docker, grpc)
+ .                   OMo           ':ddo.   Shell: typescript 5.6
+                    dMc               :OO;  Terminal: qqwozz-term
+                    0M.                 .:o. CPU: backend developer @ 100%
+                    ;Wd                     Memory: ∞ / ∞
+                     ;XO,
+                       ,d0Odlc;,..
+                           ..',;:cdOOd::,.
+                                    .:d;.':;.
+                                       'd,  .'
+                                         ;l   ..
+                                          .o
+                                            c
+                                            .'`
 
-const KALI_INFO = [
-  ['OS:', 'Kali GNU/Linux Rolling x86_64'],
-  ['Host:', 'qqwozz portfolio v2.0'],
-  ['Kernel:', 'React 18.3 + Vite 5.4'],
-  ['Uptime:', 'since 2023'],
-  ['Packages:', '5 (python, go, c++, docker, grpc)'],
-  ['Shell:', 'typescript 5.6'],
-  ['Terminal:', 'qqwozz-term'],
-  ['CPU:', 'backend developer @ 100%'],
-  ['Memory:', '∞ / ∞'],
-]
-
-const COMMANDS: Record<string, (t: (k: TranslationKey) => string) => string[]> = {
+const COMMANDS: Record<string, () => string[]> = {
   help: () => [
     ' доступные команды:',
     '',
@@ -55,9 +41,7 @@ const COMMANDS: Record<string, (t: (k: TranslationKey) => string) => string[]> =
     '  sudo       — ???',
     '  clear      — очистить терминал',
   ],
-  whoami: () => [
-    ' qqwozz',
-  ],
+  whoami: () => [' qqwozz'],
   about: () => [
     ' backend-разработчик, python · go · c++',
     ' создаю микросервисы, api и high-load системы',
@@ -81,33 +65,19 @@ const COMMANDS: Record<string, (t: (k: TranslationKey) => string) => string[]> =
     ' github    github.com/qqwozz',
     ' email     offconix@gmail.com',
   ],
-  ls: () => [
-    ' about.md  projects/  stack/  contact/  README.md',
-  ],
+  ls: () => [' about.md  projects/  stack/  contact/  README.md'],
   sudo: () => [
     ' [sudo] password for qqwozz: ********',
     ' qqwozz is not in the sudoers file. This incident will be reported.',
   ],
-  fastfetch: () => {
-    const lines: string[] = []
-    const maxLeft = Math.max(...KALI_ART.map(l => l.length))
-    const totalLines = Math.max(KALI_ART.length, KALI_INFO.length)
-    for (let i = 0; i < totalLines; i++) {
-      const left = (KALI_ART[i] || '').padEnd(maxLeft + 2)
-      const info = KALI_INFO[i]
-      if (info) {
-        lines.push(`\x1b[1m${info[0]}\x1b[0m ${info[1]}`)
-      } else {
-        lines.push(left)
-      }
-    }
-    return lines
-  },
+  fastfetch: () => FASTFETCH_OUTPUT.split('\n'),
   clear: () => [],
 }
 
+type Line = { type: 'prompt'; cmd: string } | { type: 'output'; text: string }
+
 export function TerminalSection({ t }: TerminalProps) {
-  const [lines, setLines] = useState<string[]>([''])
+  const [lines, setLines] = useState<Line[]>([])
   const [input, setInput] = useState('')
   const [history, setHistory] = useState<string[]>([])
   const [historyIdx, setHistoryIdx] = useState(-1)
@@ -123,9 +93,10 @@ export function TerminalSection({ t }: TerminalProps) {
 
   const exec = (cmd: string) => {
     const trimmed = cmd.trim().toLowerCase()
+    const promptLine: Line = { type: 'prompt', cmd }
 
     if (!trimmed) {
-      setLines(prev => [...prev, `➜  comp ${cmd}`])
+      setLines(prev => [...prev, promptLine])
       return
     }
 
@@ -135,16 +106,12 @@ export function TerminalSection({ t }: TerminalProps) {
     }
 
     const handler = COMMANDS[trimmed]
-    const prompt = `➜  comp ${cmd}`
-
-    if (trimmed === 'fastfetch') {
-      const output = handler(t)
-      setLines(prev => [...prev, prompt, ...output, ''])
-    } else if (handler) {
-      const output = handler(t)
-      setLines(prev => [...prev, prompt, ...output, ''])
+    if (handler) {
+      const output = handler()
+      const outputLines: Line[] = output.map(text => ({ type: 'output', text }))
+      setLines(prev => [...prev, promptLine, ...outputLines, { type: 'output', text: '' }])
     } else {
-      setLines(prev => [...prev, prompt, `zsh: command not found: ${trimmed}`, ''])
+      setLines(prev => [...prev, promptLine, { type: 'output', text: `zsh: command not found: ${trimmed}` }, { type: 'output', text: '' }])
     }
 
     setHistory(prev => [trimmed, ...prev])
@@ -193,15 +160,10 @@ export function TerminalSection({ t }: TerminalProps) {
           <div className="terminal-body" ref={bodyRef}>
             {lines.map((line, i) => (
               <div key={i} className="terminal-line">
-                {line.startsWith('➜  comp ') ? (
-                  <><span className="terminal-prompt">➜  comp </span><span className="terminal-cmd">{line.slice(9)}</span></>
-                ) : line.startsWith('OS:') || line.startsWith('Host:') || line.startsWith('Kernel:') || line.startsWith('Uptime:') || line.startsWith('Packages:') || line.startsWith('Shell:') || line.startsWith('Terminal:') || line.startsWith('CPU:') || line.startsWith('Memory:') ? (
-                  <span className="terminal-info-line">
-                    <span className="terminal-info-key">{line.split(' ')[0]}</span>
-                    <span className="terminal-info-val">{line.slice(line.indexOf(' ') + 1)}</span>
-                  </span>
+                {line.type === 'prompt' ? (
+                  <><span className="terminal-prompt">➜  comp </span><span className="terminal-cmd">{line.cmd}</span></>
                 ) : (
-                  <span className="terminal-output">{line}</span>
+                  <span className="terminal-output">{line.text}</span>
                 )}
               </div>
             ))}
@@ -216,7 +178,6 @@ export function TerminalSection({ t }: TerminalProps) {
                 spellCheck={false}
                 autoComplete="off"
                 autoFocus
-                placeholder="введите команду..."
               />
             </div>
             <div ref={endRef} />

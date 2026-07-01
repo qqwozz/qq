@@ -456,15 +456,13 @@ body::before {
 .terminal-body {
     padding: 14px 16px;
     height: 420px;
-    overflow-y: auto;
+    overflow-y: scroll;
     cursor: text;
-    scrollbar-width: thin;
-    scrollbar-color: #333 transparent;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
 }
 
-.terminal-body::-webkit-scrollbar { width: 6px; }
-.terminal-body::-webkit-scrollbar-track { background: transparent; }
-.terminal-body::-webkit-scrollbar-thumb { background: #333; border-radius: 3px; }
+.terminal-body::-webkit-scrollbar { display: none; }
 
 .terminal-line {
     font-size: 13px;
@@ -517,10 +515,12 @@ body::before {
     font-family: inherit;
     font-size: inherit;
     caret-color: #9ece6a;
+    padding: 0;
+    margin: 0;
 }
 
 .terminal-input::placeholder {
-    color: #444;
+    color: transparent;
 }
 
 /* ========== SECTION TITLES ========== */
